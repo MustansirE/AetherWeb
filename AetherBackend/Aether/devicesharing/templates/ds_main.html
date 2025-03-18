@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+
+<html>
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <title>Device Sharing</title>
+        <meta name="description" content="">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <link rel="stylesheet" href="">
+    </head>
+    <body>
+        
+        <p><a href="{% url 'home' %}">< Back to Home</a></p>
+
+        <br>
+
+        <!-- Search Bar -->
+        <h3> Search </h3>
+        <form action="{% url 'search_results' %}" method="get">
+            <input type="text" name="query" placeholder="Search for a device using a code..." required>
+            <button type="submit">Search</button>
+        </form>
+
+        <br>
+
+
+        <br>
+
+        <h3> My Listings </h3>
+        {% for listing in my_listings %}
+            <p>{{ listing.device.name }}</p>
+            <form action="{% url 'remove_listing' listing.device.device_id %}" method="post" style="display:inline;">
+                {% csrf_token %}
+                <button type="submit">Remove</button>
+            </form>
+        {% empty %}
+            <p> No devices currently listed... </p>
+        {% endfor %}
+        <p>
+        <a href="{% url 'add_listing' %}">
+            <button>Add a Listing</button>
+        </a>
+        </p>
+
+        <br>
+
+        <h3> Requests </h3>
+        <h6>Pending</h6>
+        {% for request in pending_requests %}
+            <p>{{ request.listing.device.name }} from user {{ request.user.user.email }}</p>
+            <form action="{% url 'approve_request' request.id %}" method="post" style="display:inline;">
+                {% csrf_token %}
+                <button type="submit">Approve</button>
+            </form>
+            <form action="{% url 'decline_request' request.id%}" method="post" style="display:inline;">
+                {% csrf_token %}
+                <button type="submit">Decline</button>
+            </form>
+        {% empty %}
+            <p> No pending requests... </p>
+        {% endfor %}
+        <h6>Active</h6>
+        {% for request in active_requests %}
+            <p>{{ request.listing.device.name }} from user {{ request.user.user.email }}</p>
+        {% empty %}
+            <p> No Active lends... </p>
+        {% endfor %}
+
+        <script src="" async defer></script>
+    </body>
+</html>

@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Delete Account</title>
+</head>
+<body>
+    <h2>Are you sure? We are sad to see you leave :(</h2>
+
+    <form method="post">
+        {% csrf_token %}
+        <button type="submit">Confirm Deletion</button>
+    </form>
+
+    <a href="{% url 'settings' %}">Cancel</a>
+</body>
+</html>

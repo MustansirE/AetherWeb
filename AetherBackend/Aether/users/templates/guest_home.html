@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Home</title>
+</head>
+<body>
+    <h1>Welcome, {{ request.user.first_name }}</h1>
+
+       <!-- List of Rooms -->
+       {% if rooms %}
+       <h2>Your Rooms</h2>
+       <ul>
+           {% for room in rooms %}
+               <li>
+
+                   <strong>{{ room.name }}</strong>
+                   <!-- List of Devices in Room -->
+                   <ul>
+                       {% for device in room.devices.all %}
+                           <li>
+                               {{ device.name }} #{{ device.device_number}} ({{ device.status }}) 
+                               <!-- Form to Toggle Device -->
+                               <form action="{% url 'toggle_device' device.device_id %}" method="post" style="display:inline;">
+                                   {% csrf_token %}
+                                   <button type="submit">
+                                       {% if device.status == 'on' %}Turn Off{% else %}Turn On{% endif %}
+                                   </button>
+                               </form>
+                           </li>
+                       {% empty %}
+                           <li>No devices in this room.</li>
+                       {% endfor %}
+                   </ul>
+                   
+               </li>
+           {% endfor %}
+       </ul>
+   {% else %}
+       <p>No rooms available.</p>
+   {% endif %}
+
+
+    <a href="{% url 'guest_logout_view' %}">Logout</a>
+    
+</body>
+</html>

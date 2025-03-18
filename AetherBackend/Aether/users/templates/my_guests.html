@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <title></title>
+        <meta name="description" content="">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <link rel="stylesheet" href="">
+    </head>
+    <body>
+    
+        <h1>Current Guests</h1>
+        <ul>
+            {% for guest in guests %}
+                <li>
+                    {{ guest.user.first_name }} {{ guest.user.last_name }} 
+                    (Code: {{ guest.code }})
+                    
+                    <!-- Form to Remove Guest -->
+                    <form action="{% url 'my_guests' %}" method="post" style="display:inline;">
+                        {% csrf_token %}
+                        <input type="hidden" name="guest_id" value="{{ guest.id }}">
+                        <button type="submit">Remove Guest</button>
+                    </form>
+                </li>
+            {% empty %}
+                <li>No guests currently added.</li>
+            {% endfor %}
+        </ul>
+        
+        <a href="{% url 'add_guest' %}"> Add a Guest </a>
+
+        {% if success %}
+            <p style="color: green;">{{ success }}</p>
+            <p>Your Guest Code: <strong>{{ code }}</strong></p>
+            <p>House ID: <strong>{{ house }}</strong></p>
+        {% endif %}
+
+        {% if error %}
+            <p style="color: red;">{{ error }}</p>
+        {% endif %}
+        
+        <p> <a href="{% url 'home' %}">Back to Home</a> </p>
+        <script src="" async defer></script>
+    </body>
+</html>

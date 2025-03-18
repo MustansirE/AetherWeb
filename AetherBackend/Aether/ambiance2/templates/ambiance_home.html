@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ambiance Modes</title>
+</head>
+<body>
+    <h1>Ambiance Modes</h1>
+    
+    <label for="room-select">Select a Room:</label>
+    <select id="room-select">
+        <option value="">-- Select a Room --</option>
+        {% for room in rooms %}
+            <option value="{{ room.room_id }}">{{ room.name }}</option>
+        {% endfor %}
+    </select>
+    
+    <div id="modes-container">
+    </div>
+    
+    <button onclick="window.location.href='{% url 'add_ambiance' %}'">Add Mode</button>
+    <br>
+    <a href="{% url 'home' %}">Back to Home</a>
+    
+    <script>
+        document.getElementById('room-select').addEventListener('change', function() {
+            let roomId = this.value;
+            let modesContainer = document.getElementById('modes-container');
+            modesContainer.innerHTML = '';
+            
+            if (roomId) {
+                fetch(`get_modes/${roomId}/`)
+                    .then(response => response.json())
+                    .then(data => {
+                        data.modes.forEach(mode => {
+                            let modeDiv = document.createElement('div');
+                            modeDiv.innerHTML = `
+                                <p><strong>${mode.name}</strong></p>
+                                <button onclick="window.location.href='/ambiance/mode/${mode.id}/'">See More Info</button>
+                            `;
+                            modesContainer.appendChild(modeDiv);
+                        });
+                    });
+            }
+        });
+    </script>
+</body>
+</html>

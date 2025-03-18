@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Usage Statistics</title>
+</head>
+<body>
+    <h1>Usage Statistics</h1>
+
+    <h2>Hourly Usage for Today</h2>
+    <table border="1">
+        <thead>
+            <tr>
+                <th>Hour</th>
+                <th>Total Consumption (kWh)</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for hour, consumption in hourly_usage %}
+                <tr>
+                    <td>{{ hour }}:00</td>
+                    <td>{{ consumption }}</td>
+                </tr>
+            {% empty %}
+                <tr>
+                    <td colspan="2">No hourly usage data available.</td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <h2>Daily Usage for This Week</h2>
+    <table border="1">
+        <thead>
+            <tr>
+                <th>Day</th>
+                <th>Total Consumption (kWh)</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for day, consumption in daily_usage %}
+                <tr>
+                    <td>{{ day }}</td>
+                    <td>{{ consumption }}</td>
+                </tr>
+            {% empty %}
+                <tr>
+                    <td colspan="2">No daily usage data available.</td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <h2>Weekly Usage for This Month</h2>
+    <table border="1">
+        <thead>
+            <tr>
+                <th>Week</th>
+                <th>Total Consumption (kWh)</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for week, consumption in weekly_usage %}
+                <tr>
+                    <td>{{ week }}</td>
+                    <td>{{ consumption }}</td>
+                </tr>
+            {% empty %}
+                <tr>
+                    <td colspan="2">No weekly usage data available.</td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <h2>Monthly Usage for This Year</h2>
+    <table border="1">
+        <thead>
+            <tr>
+                <th>Month</th>
+                <th>Total Consumption (kWh)</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for month, consumption in monthly_usage %}
+                <tr>
+                    <td>{{ month }}</td>
+                    <td>{{ consumption }}</td>
+                </tr>
+            {% empty %}
+                <tr>
+                    <td colspan="2">No monthly usage data available.</td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <h2>Yearly Usage for the Past 5 Years</h2>
+    <table border="1">
+        <thead>
+            <tr>
+                <th>Year</th>
+                <th>Total Consumption (kWh)</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for year, consumption in yearly_usage %}
+                <tr>
+                    <td>{{ year }}</td>
+                    <td>{{ consumption }}</td>
+                </tr>
+            {% empty %}
+                <tr>
+                    <td colspan="2">No yearly usage data available.</td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <a href="{% url 'energy_home' %}">Back to Dashboard</a>
+</body>
+</html>

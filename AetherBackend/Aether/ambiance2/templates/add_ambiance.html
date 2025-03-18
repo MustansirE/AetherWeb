@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <title>Add Mode</title>
+        <meta name="description" content="">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+    </head>
+    <body>
+
+        <h1>Add Mode</h1>
+
+        <form method="post">
+            {% csrf_token %}
+
+            <label for="mode_name">Mode Name:</label>
+            <input type="text" name="mode_name" id="mode_name" required>
+
+            <label for="room">Select Room:</label>
+            <select name="room" id="room" required>
+                <option value="" selected disabled>Choose a room</option>
+                {% for room in rooms %}
+                    <option value="{{ room.room_id }}">{{ room.name }}</option>
+                {% endfor %}
+            </select>
+
+            <div id="device-section" style="display: none;">
+                <label for="device">Select Device:</label>
+                <select name="device" id="device" required>
+                    <option value="" selected disabled>Choose a device</option>
+                </select>
+
+                <label for="state">Select State:</label>
+                <select name="state" id="state" required>
+                    <option value="" selected disabled>Choose a state</option>
+                </select>
+
+                <button type="submit" name="add_device">Add Device</button>
+            </div>
+
+            <ul>
+                {% for device in selected_devices %}
+                    <li>{{ device.name }}
+                        <button type="submit" name="remove_device" value="{{ device.device_id }}">Remove</button>
+                    </li>
+                {% endfor %}
+            </ul>
+
+            <input type="hidden" id="selected_devices" name="selected_devices" value="">
+
+            <button type="submit" name="save_mode">Add Mode</button>
+        </form>
+
+        <a href="{% url 'home' %}">Back to Home</a>
+
+        <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+        <script>
+            $(document).ready(function () {
+                let selectedDevices = new Set();
+                
+                // Restore selected devices from hidden input (if any)
+                let storedDevices = $('#selected_devices').val();
+                if (storedDevices) {
+                    selectedDevices = new Set(storedDevices.split(',').filter(Boolean));
+                }
+            
+                // Handle room selection
+                $('#room').change(function () {
+                    let roomId = $(this).val();
+                    if (roomId) {
+                        $('#device-section').show();
+                        loadDevices(roomId);
+                    } else {
+                        $('#device-section').hide();
+                    }
+                });
+            
+                // Load devices based on selected room
+                function loadDevices(roomId) {
+                    $.ajax({
+                        url: '{% url "get_devices" %}',
+                        data: { 'room_id': roomId },
+                        success: function (data) {
+                            let deviceDropdown = $('#device');
+                            deviceDropdown.empty().append('<option value="" selected disabled>Choose a device</option>');
+            
+                            data.devices.forEach(function (device) {
+                                if (!selectedDevices.has(device.device_id)) {
+                                    deviceDropdown.append('<option value="' + device.device_id + '">' + device.name + '</option>');
+                                }
+                            });
+            
+                            $('#state').empty().append('<option value="" selected disabled>Choose a state</option>');
+                        }
+                    });
+                }
+            
+                // Handle device selection
+                $('#device').change(function () {
+                    let deviceId = $(this).val();
+                    if (deviceId) {
+                        $.ajax({
+                            url: '{% url "get_device_states" %}',
+                            data: { 'device_id': deviceId },
+                            success: function (data) {
+                                let stateDropdown = $('#state');
+                                stateDropdown.empty().append('<option value="" selected disabled>Choose a state</option>');
+                                data.states.forEach(function (state) {
+                                    stateDropdown.append('<option value="' + state + '">' + state + '</option>');
+                                });
+                            }
+                        });
+                    }
+                });
+            
+                // Handle form submission
+                $('form').submit(function (event) {
+                    let modeNameInput = $('#mode_name');
+                    let isSaveMode = $('button[name="save_mode"]').is(':focus');
+            
+                    if (isSaveMode) {
+                        if (!modeNameInput.val().trim()) {
+                            alert("Please enter a mode name.");
+                            event.preventDefault();
+                        }
+                    } else {
+                        modeNameInput.removeAttr('required'); // Not required when adding/removing devices
+                    }
+            
+                    // Store selected devices in hidden input before submitting
+                    $('#selected_devices').val(Array.from(selectedDevices).join(','));
+                });
+            
+                // When adding a device, prevent room selection from changing
+                $('button[name="add_device"]').click(function (event) {
+                    let selectedDevice = $('#device').val();
+                    if (selectedDevice) {
+                        selectedDevices.add(selectedDevice);
+                        $('#room').prop('disabled', true);
+                        $('#selected_devices').val(Array.from(selectedDevices).join(',')); // Update hidden input
+                    }
+                });
+            
+                // When removing a device, allow room selection if no devices are left
+                $('button[name="remove_device"]').click(function (event) {
+                    let deviceId = $(this).val();
+                    selectedDevices.delete(deviceId);
+                    if (selectedDevices.size === 0) {
+                        $('#room').prop('disabled', false);
+                    }
+                    $('#selected_devices').val(Array.from(selectedDevices).join(',')); // Update hidden input
+                    loadDevices($('#room').val()); // Refresh device list
+                });
+            
+                // Disable room selection if devices are already selected
+                if (selectedDevices.size > 0) {
+                    $('#room').prop('disabled', true);
+                }
+            });
+                      
+        </script>
+
+    </body>
+</html>

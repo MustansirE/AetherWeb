@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Add Room</title>
+</head>
+<body>
+    <h2>Add Room to House</h2>
+    <form method="POST">
+        {% csrf_token %}
+        <label for="room_name">Room Name:</label>
+        <input type="text" name="room_name" id="room_name" required>
+        <button type="submit">Add Room</button>
+    </form>    
+    <a href="{% url 'roomsanddevices'%}"> Back to Rooms and Devices </a>
+</body>
+</html>

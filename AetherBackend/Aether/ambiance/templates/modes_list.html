@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>Ambiance Modes</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+</head>
+<body>
+    <h1>Ambiance Modes</h1>
+    <button type="submit"><a href="{% url 'add_ambiance_mode'  %}">Add Mode</a></button>   
+    <ul>
+        {% for room in rooms %}
+            <ul>
+                {% for mode in room.modes.all %}
+                    <li>
+                        <strong>{{ mode.name }}</strong>
+                        <form action="{% url 'toggle_ambiance' mode.id %}" method="post" style="display:inline;">
+                            {% csrf_token %}
+                            <button type="submit">
+                                {% if mode.status == 'on' %}Turn Off{% else %}Turn On{% endif %}
+                            </button>
+                        </form>
+                        <form action="{% url 'mode_details' mode.id %}" method="post" style="display:inline;">
+                            {% csrf_token %}
+                            <button type="submit">Details</button>
+                        </form>
+                    </li>
+                {% empty %}
+                {% endfor %}         
+            </ul>
+        {% empty %}
+            <p>No rooms available in this house.</p>
+        {% endfor %}
+    </ul>
+
+    <p><a href="{% url 'home' %}">Back to Home</a></p>
+</body>
+</html>

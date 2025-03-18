@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>Add Ambiance Mode</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+</head>
+<body>
+    <h1>Add Ambiance Mode</h1>
+
+    <form method="post">
+        {% csrf_token %}
+        
+        <label for="name">Mode Name:</label>
+        <input type="text" id="name" name="name" required><br><br>
+
+        <label for="room">Select Room:</label>
+        <select id="room" name="room" required>
+            {% for room in rooms %}
+                <option value="{{ room.room_id }}">{{ room.name }}</option>
+            {% endfor %}
+        </select><br><br>
+
+        <button type="submit">Setup Mode</button>
+    </form>
+
+    <p><a href="{% url 'modes_list' %}">Back to Modes</a></p>
+</body>
+</html>

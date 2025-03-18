@@ -1,0 +1,53 @@
+{% load custom_filters %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Edit Mode: {{ mode.name }}</title>
+</head>
+<body>
+    <h1>Edit Mode: {{ mode.name }}</h1>
+
+    <form method="post">
+        {% csrf_token %}
+        
+        {% for device in devices %}
+            <div>
+                <h3>{{ device.name }} #{{ device.device_number }}</h3>
+                {% with existing_states|get_item:device.device_id as selected_state %}
+                    {% if device.general_product_code == 'AF0005' %}
+                        <label for="state_{{ device.device_id }}">Light Color:</label>
+                        <select name="state_{{ device.device_id }}" id="state_{{ device.device_id }}">
+                            {% for option in device_options|get_item:device.device_id %}
+                                <option value="{{ option }}" {% if option == selected_state %}selected{% endif %}>{{ option }}</option>
+                            {% endfor %}
+                        </select><br>
+                    {% elif device.general_product_code == 'AF0003' %}
+                        <label for="state_{{ device.device_id }}">Diffuser Scent:</label>
+                        <select name="state_{{ device.device_id }}" id="state_{{ device.device_id }}">
+                            {% for option in device_options|get_item:device.device_id %}
+                                <option value="{{ option }}" {% if option == selected_state %}selected{% endif %}>{{ option }}</option>
+                            {% endfor %}
+                        </select><br>
+                    {% elif device.general_product_code == 'LF0002' %}
+                        <label for="state_{{ device.device_id }}">Speaker Mode:</label>
+                        <select name="state_{{ device.device_id }}" id="state_{{ device.device_id }}">
+                            {% for option in device_options|get_item:device.device_id %}
+                                <option value="{{ option }}" {% if option == selected_state %}selected{% endif %}>{{ option }}</option>
+                            {% endfor %}
+                        </select><br>
+                    {% elif device.general_product_code == 'AV0001' %}
+                        <label for="state_{{ device.device_id }}">Thermostat Temperature:</label>
+                        <input type="number" name="state_{{ device.device_id }}" id="state_{{ device.device_id }}" value="{{ selected_state }}">
+                    {% endif %}
+                {% endwith %}
+            </div>
+        {% endfor %}
+
+        <button type="submit">Save Changes</button>
+    </form>
+
+    <p><a href="{% url 'modes_list' %}">Back to Modes</a></p>
+</body>
+</html>

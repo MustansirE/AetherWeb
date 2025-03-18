@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Search Results</title>
+</head>
+<body>
+
+    <p><a href="{% url 'ds_main' %}">< Back to Device Sharing</a></p>
+
+    <h2>Search Results</h2>
+
+        <!-- search.html -->
+        {% for listing in listings %}
+            <div>
+                <p>{{ listing.device.name }} - {{ listing.condition }}</p>
+                
+                {% if listing.has_requested %}
+                    <button disabled>Requested</button> <!-- Disabled if already requested -->
+                {% else %}
+                    <form action="{% url 'create_request' listing.id %}" method="post">
+                        {% csrf_token %}
+                        <button type="submit">Request</button>
+                    </form>
+                {% endif %}
+            </div>
+        {% empty %}
+            <p>No results found.</p>
+        {% endfor %}
+
+
+</body>
+</html>

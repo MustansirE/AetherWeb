@@ -1,0 +1,193 @@
+[
+    {
+        "name": "Thermostat",
+        "general_product_code": "AV0001",
+        "average_energy_consumption_per_hour": 0.03,
+        "manufacturer": "Aether"
+    },
+    {
+        "name": "Humidity Control Unit",
+        "general_product_code": "AT0002",
+        "average_energy_consumption_per_hour": 0.3,
+        "manufacturer": "Aether"
+    },
+    {
+        "name": "Oil Diffuser",
+        "options": ["clean", "sandalwood", "rose", "ocean", "cookie", "eucalyptus", "lemongrass"],
+        "general_product_code": "AF0003",
+        "average_energy_consumption_per_hour": 0.01,
+        "manufacturer": "Aether"
+    },
+    {
+        "name": "Air Purifier",
+        "general_product_code": "AT0004",
+        "average_energy_consumption_per_hour": 0.15,
+        "manufacturer": "Aether"
+    },
+    {
+        "name": "Chromatherapy Lights",
+        "options": ["red", "gold", "white", "green", "blue", "violet"],
+        "general_product_code": "AF0005",
+        "average_energy_consumption_per_hour": 0.06,
+        "manufacturer": "Aether"
+    },
+    {
+        "name": "Smart Curtains",
+        "options": ["open", "shut"],
+        "general_product_code": "AF0006",
+        "average_energy_consumption_per_hour": 0.001,
+        "manufacturer": "Aether"
+    },
+    {
+        "name": "Smart Lock",
+        "options": ["lock", "unlock"],
+        "general_product_code": "AF0007",
+        "average_energy_consumption_per_hour": 0.002,
+        "manufacturer": "Aether"
+    },
+    {
+        "name": "Alarm",
+        "options": ["sleep", "emergency", "alert"],
+        "general_product_code": "AF0008",
+        "average_energy_consumption_per_hour": 0.005,
+        "manufacturer": "Aether"
+    }, 
+
+
+    {
+        "name": "Sprinkler",
+        "general_product_code": "OT0001",
+        "average_energy_consumption_per_hour": 0.02,
+        "manufacturer": "Aether"
+    },
+    {
+        "name": "Privacy Glass",
+        "general_product_code": "OT0002",
+        "average_energy_consumption_per_hour": 0.01,
+        "manufacturer": "Aether"
+    },
+
+
+
+    {
+        "name": "Smart TV",
+        "general_product_code": "LT0001",
+        "average_energy_consumption_per_hour": 0.2,
+        "manufacturer": "Aether"
+    },    
+    {
+        "name": "Speakers",
+        "options": ["idle", "bluetooth", "pop", "jazz", "classical", "nature sounds", "white noise"],
+        "general_product_code": "LF0002",
+        "average_energy_consumption_per_hour": 0.05,
+        "manufacturer": "Aether"
+    },    
+    {
+        "name": "RoboVacuum",
+        "options": ["daily", "deep clean"],
+        "general_product_code": "LF0003",
+        "average_energy_consumption_per_hour": 0.15,
+        "manufacturer": "Aether"
+    },   
+    
+
+    {
+        "name": "Floatation Bathtub",
+        "general_product_code": "BT0001",
+        "average_energy_consumption_per_hour": 2.0,
+        "manufacturer": "Aether"
+    },    
+
+
+   
+    {
+        "name": "Smart Fridge",
+        "general_product_code": "KV0001",
+        "average_energy_consumption_per_hour": 0.3,
+        "manufacturer": "Aether"
+    },
+    {
+        "name": "Smart Oven",
+        "options": ["preheat", "baking"],
+        "general_product_code": "KF0002",
+        "average_energy_consumption_per_hour": 2.25,
+        "manufacturer": "Aether"
+    },
+
+
+    {
+        "name": "Water Monitoring System",
+        "options": ["secure", "detects a leak!"],
+        "general_product_code": "MY0001",
+        "average_energy_consumption_per_hour": 0.01,
+        "manufacturer": "Aether"
+    }, 
+
+    {
+        "name": "Motion Sensor",
+        "options": ["idle", "triggered"],
+        "general_product_code": "MY0002",
+        "average_energy_consumption_per_hour": 0.0025,
+        "manufacturer": "Aether"
+    },
+
+    {
+        "name": "Temperature Sensor",
+        "general_product_code": "MZ0003",
+        "average_energy_consumption_per_hour": 0.0025,
+        "manufacturer": "Aether"
+    },
+
+    {
+        "name": "Humidity Sensor",
+        "general_product_code": "MZ0004",
+        "average_energy_consumption_per_hour": 0.0025,
+        "manufacturer": "Aether"
+    },
+    
+    {
+        "name": "Light Intensity Sensor",
+        "general_product_code": "MZ0005",
+        "average_energy_consumption_per_hour": 0.0025,
+        "manufacturer": "Aether"
+    },
+
+
+    {
+        "name": "Pest Detector",
+        "options": ["safe", "detects a pest!"],
+        "general_product_code": "SY0001",
+        "average_energy_consumption_per_hour": 0.0010,
+        "manufacturer": "Aether"
+    },
+    {
+        "name": "Water Hardness Tester",
+        "general_product_code": "SZ0002",
+        "average_energy_consumption_per_hour": 0.0010,
+        "manufacturer": "Aether"
+    },
+    {
+        "name": "Party Kit",
+        "general_product_code": "ST0003",
+        "average_energy_consumption_per_hour": 2.5,
+        "manufacturer": "Aether"
+    },
+    {
+        "name": "Outdoor Movie Night Set",
+        "general_product_code": "ST0004",
+        "average_energy_consumption_per_hour": 2.5,
+        "manufacturer": "Aether"
+    },
+    {
+        "name": "Stargazer Tools",
+        "general_product_code": "ST0005",
+        "average_energy_consumption_per_hour": 1.2,
+        "manufacturer": "Aether"
+    },
+    {
+        "name": "Home Spa",
+        "general_product_code": "ST0006",
+        "average_energy_consumption_per_hour": 2.1,
+        "manufacturer": "Aether"
+    }
+]

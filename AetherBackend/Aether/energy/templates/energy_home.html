@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Energy Home</title>
+</head>
+<body>
+    <h1>Energy Dashboard</h1>
+
+    <p> <a href="{% url 'home' %}">< Back to Home</a> </p>
+
+    <!-- Daily Goal and Progress -->
+    <section>
+        <h2>Daily Energy Goal</h2>
+        {% if goal %}
+            <p>Your goal: {{ goal.goal }} kWh</p>
+            <p>Progress: {{ daily_progress }} kWh</p>
+            <form action="{% url 'remove_goal' %}" method="post">
+                {% csrf_token %}
+                <button type="submit">Remove Goal</button>
+            </form>
+        {% else %}
+            <p>No energy goal set. <a href="{% url 'set_goal' %}">Set one now</a>.</p>
+        {% endif %}
+    </section>
+
+    <section>
+        <h2>Energy Projections</h2>
+        <p>Projected usage for the rest of this month: {{ projected_usage_month }} kWh</p>
+        <p>Projected cost for the rest of this month: ${{ projected_cost_month }}</p>
+        
+        <p>Projected usage for the rest of this year: {{ projected_usage_year }} kWh</p>
+        <p>Projected cost for the rest of this year: ${{ projected_cost_year }}</p>            
+    </section>
+
+    <!-- Usage Stats -->
+    <section>
+        <h2>Usage Statistics</h2>
+        <a href="{% url 'usage_stats' %}">View Detailed Stats</a>
+    </section>
+
+    <!-- Community Events -->
+    <section>
+      <h2>Community Events</h2>
+      {% if events %}
+          {% for event in events %}
+              <div>
+                  <h3>{{ event.name }}</h3>
+                  <p>{{ event.description }}</p>
+                  <p>Date: {{ event.date }}</p>
+                  {% if event.joined %}
+                      <p>Status: Joined</p>
+                      <a href="{% url 'leave_event' event.id %}">Leave Event</a>
+                  {% else %}
+                      <a href="{% url 'join_event' event.id %}">Join Event</a>
+                  {% endif %}
+              </div>
+          {% endfor %}
+      {% else %}
+          <p>No community events available at the moment.</p>
+      {% endif %}        
+  </section>
+  
+
+    <!-- Share Stats -->
+    <section>
+        <h2>Share Your Stats</h2>
+        <button>Twitter</button>
+        <button>Facebook</button>
+        <button>Instagram</button>
+    </section>
+
+</body>
+</html>

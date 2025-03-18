@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <title>Routine Details</title>
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+    </head>
+    <body>
+        <h1>Routine Details</h1>
+
+        <p><strong>Name:</strong> {{ automation.name }}</p>
+        <p><strong>Trigger Time:</strong> {{ automation.trigger_time }}</p>
+
+        <h2>Devices to Turn On</h2>
+        <ul>
+            {% for device in automation.devices_on.all %}
+                <li> {{ device.name }} #{{ device.device_number }} ({{ device.room.name }}) </li>
+            {% empty %}
+                <li>No devices to turn on.</li>
+            {% endfor %}
+        </ul>
+
+        <h2>Devices to Turn Off</h2>
+        <ul>
+            {% for device in automation.devices_off.all %}
+                <li> {{ device.name }} #{{ device.device_number }} ({{ device.room.name }}) </li>
+            {% empty %}
+                <li>No devices to turn off.</li>
+            {% endfor %}
+        </ul>
+
+        <form action="{% url 'edit_automation' automation.id %}" method="get" style="display:inline;">
+            {% csrf_token %}
+            <button type="submit">Edit</button>
+        </form>
+        <br>
+        <form action="{% url 'delete_automation' automation.id %}" method="post" style="display:inline;">
+            {% csrf_token %}
+            <button type="submit">Delete</button>
+        </form>
+
+        <p><a href="{% url 'automations_list' %}">< Back to Routines</a></p>
+    </body>
+</html>

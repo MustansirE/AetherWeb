@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sign Up</title>
+</head>
+<body>
+    <a href="{% url 'start' %}">back</a><br>
+    <h1>Sign Up</h1>
+    <form method="POST">
+        {% csrf_token %}
+        <div>
+            <label for="id_first_name">First Name:</label>
+            {{ form.first_name }}
+        </div>
+        <div>
+            <label for="id_last_name">Last Name:</label>
+            {{ form.last_name }}
+        </div>
+        <div>
+            <label for="id_email">Email:</label>
+            {{ form.email }}
+        </div>
+        <div>
+            <label for="id_password">Password:</label>
+            {{ form.password }}
+        </div>
+        <div>
+            <label for="id_confirm_password">Confirm Password:</label>
+            {{ form.confirm_password }}
+        </div>
+        <div>
+            <label for="id_plan_type">Plan Type:</label>
+            {{ form.plan_type }}
+        </div>
+        <button type="submit">Sign Up</button>
+    </form>
+    
+</body>
+</html>

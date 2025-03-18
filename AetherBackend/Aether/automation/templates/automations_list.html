@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <title>Routines</title>
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+    </head>
+    <body>
+        <h1>Routines</h1>
+
+        <p><a href="{% url 'home' %}">< Back to Home </a></p>
+        <ul>
+            {% for automation in automations %}
+                <li>
+                    <strong>{{ automation.name }}</strong> 
+                    Trigger time: {{ automation.trigger_time }}
+                    <form action="{% url 'automation_details' automation.id %}" method="post" style="display:inline;">
+                        {% csrf_token %}
+                        <button type="submit">View Details</button>
+                    </form>
+                </li>
+            {% empty %}
+                <li>No routines available.</li>
+            {% endfor %}
+        </ul>
+
+        <form action="{% url 'add_automation' %}" method="get" style="display:inline;">
+            {% csrf_token %}
+            <button type="submit">Add Routine</button>
+        </form>
+    </body>
+</html>

@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Guest Login</title>
+</head>
+<body>
+    <a href="{% url 'start' %}">back</a><br>
+    <h1>Guest Login</h1>
+    <form method="POST" action="{% url 'guest_login' %}">
+        {% csrf_token %}
+        
+        {% if form.errors %}
+            <div class="error">
+                {% for field in form %}
+                    {% for error in field.errors %}
+                        <p><strong>{{ error }}</strong></p>
+                    {% endfor %}
+                {% endfor %}
+            </div>
+        {% endif %} 
+    
+        <div>
+            <label for="code">House ID</label>
+            {{ form.house_id }}
+        </div>
+
+        <div>
+            <label for="code">Guest Code</label>
+            {{ form.code }}
+        </div>
+        
+        <div>
+            <label for="first_name">First Name</label>
+            {{ form.first_name }}
+        </div>
+    
+        <div>
+            <label for="last_name">Last Name</label>
+            {{ form.last_name }}
+        </div>
+    
+        <button type="submit">Login</button>
+    </form>
+    
+    
+</body>
+</html>

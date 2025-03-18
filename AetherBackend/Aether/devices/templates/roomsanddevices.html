@@ -1,0 +1,97 @@
+{% load custom_filters %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="refresh" content="5">
+    <title>Rooms and Devices</title>
+</head>
+<body>
+    <h1>Rooms and Devices</h1>
+   
+    <p><a href="{% url 'add_room' %}">Add a Room</a></p>
+
+    <!-- List of Rooms -->
+    {% if rooms %}
+        <h2>Your Rooms</h2>
+        <ul>
+            {% for room in rooms %}
+                <li>
+                    <strong>{{ room.name }} #{{ room.room_number }}</strong>
+                    <form action="{% url 'remove_room' room.room_id %}" method="post" style="display:inline;">
+                        {% csrf_token %}
+                        <button type="submit">Remove Room</button>
+                    </form>
+
+                    <!-- List of Devices in Room -->
+                    <ul>
+                        {% for device in room.devices.all %}
+                            <li>
+                                {{ device.name }} #{{ device.device_number }} ({{ device.status }})
+                                <!-- Form to Toggle Device -->
+                                <form action="{% url 'toggle_device' device.device_id %}" method="post" style="display:inline;">
+                                    {% csrf_token %}
+                                    <button type="submit">
+                                        {% if device.status == 'on' %}Turn Off{% else %}Turn On{% endif %}
+                                    </button>
+                                </form>
+
+                                <!-- Dropdown for FixedOptionDevice (only if device is 'on') -->
+                                {% if device.status == 'on' %}
+                                    {% if device.get_device_type == 'Fixed' %}
+                                        <form action="{% url 'update_device_state' device.device_id %}" method="post">
+                                            {% csrf_token %}
+                                            <label for="fixed_option">Select Option:</label>
+                                            <select name="fixed_option" id="fixed_option">
+                                                {% for option in device_options|get_item:device.device_id %}
+                                                    <option value="{{ option|as_comma_separated }}" {% if option|as_comma_separated == updated_device_states|get_item:device.device_id %}selected{% endif %}>{{ option|as_comma_separated }}</option>
+                                                {% endfor %}
+                                            </select>
+                                            <button type="submit">Save</button>
+                                        </form>
+                                    {% elif device.get_device_type == 'MonitorFixed' %}
+                                        <strong>Current State:</strong> {{ device.monitorfixed_device.first.state |as_comma_separated}}
+                                    {% elif device.get_device_type == 'MonitorVariable' %}
+                                        <strong>Current State:</strong> {{ device.monitorvariable_device.first.state |as_comma_separated}}
+                                    {% elif device.get_device_type == 'Variable' %}
+                                        <form action="{% url 'update_device_state' device.device_id %}" method="post">
+                                            {% csrf_token %}
+                                            <label for="variable_state"></label>
+                                            <input type="number" name="variable_state" id="variable_state" min="0" max="100" 
+                                                   value="{{ updated_device_states|get_item:device.device_id|default:25 }}">
+                                            <button type="submit">Save</button>
+                                        </form>
+                                    {% endif %}
+                                    
+                                    
+                                {% endif %}
+
+                                <!-- Form to Remove Device -->
+                                <form action="{% url 'remove_device' device.device_id %}" method="post" style="display:inline;">
+                                    {% csrf_token %}
+                                    <button type="submit">Remove Device</button>
+                                </form>
+
+                                <!-- Button to View Device Info -->
+                                <a href="{% url 'device_info' device.device_id %}">View Info</a>
+                            </li>
+                        {% empty %}
+                            <li>No devices in this room.</li>
+                        {% endfor %}
+                    </ul>
+
+                    <!-- Form to Add Device -->
+                    <p><a href="{% url 'add_device' room.room_id %}">Add a Device</a></p>
+                    
+                </li>
+            {% endfor %}
+        </ul>
+    {% else %}
+        <p>No rooms available. Add a room to get started!</p>
+    {% endif %}
+
+    <p><a href="{% url 'home' %}">Back to Home</a></p>
+    
+</body>
+</html>

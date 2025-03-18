@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Device Info</title>
+</head>
+<body>
+    <h1>Device Information</h1>
+    <p><strong>Name:</strong> {{ device.name }} #{{device.device_number}} </p>
+    <p><strong>General Product Code:</strong> {{ device.general_product_code }}</p>
+    <p><strong>Manufacturer:</strong> {{ device.manufacturer }}</p>
+    <p><strong>Room:</strong> {{ device.room.name }} </p>
+    <p><strong>Device ID:</strong> {{ device.device_id }}</p>
+
+    <p><strong>Average Energy Consumption (per hour):</strong> {{ device.average_energy_consumption_per_hour }} kWh</p>
+    <p><strong>Status:</strong> {{ device.status }}</p>
+    {% if state %}
+    <p><strong>Current Mode:</strong> {{ state }}</p>
+    {% endif %}
+    <p><a href="{% url 'roomsanddevices' %}">Back to Rooms and Devices</a></p>
+</body>
+</html>

@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Add Device to Room</title>
+</head>
+<body>
+    <h2>Add Device to {{ room.name }} </h2>
+    <form method="POST">
+        {% csrf_token %}
+
+        <label for="general_product_code">Product Code:</label>
+        <input type="text" name="general_product_code" id="general_product_code" required><br>
+
+        <button type="submit">Add Device</button>
+    </form>
+    <a href="{% url 'roomsanddevices' %}">Back to Room</a>
+</body>
+</html>

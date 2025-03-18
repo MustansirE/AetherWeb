@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Home</title>
+</head>
+<body>
+    <h1>Welcome, {{ request.user.first_name }}</h1>
+
+    <h4>Notifications</h4>
+    {% if ve_notif %}
+        <p>It's {{ temperature }}C, the humidity is {{ humidity }}, and the light intensity is {{ light_intensity }} </p>
+        <p> Do you want to {{ choice }} your house? You can activate the {{ name }} Virtual Environment! </p>
+    {% else %}
+        <p>No Virtual Environment valid for activation yet...</p>
+    {% endif %}
+    
+    <br>
+    <h4> Alerts </h4>
+    {% for alert_notif in alert_notifs %}
+        <p> {{ alert_notif.message }} </p>
+    {% empty %}
+        <p> No alerts... </p>
+    {% endfor %}
+    <br>
+
+    <p><a href="{% url 'roomsanddevices' %}"> Go to Rooms and Devices ></a></p>
+    <p><a href="{% url 'energy_home' %}"> Energy Stats ></a></p>
+    <p><a href="{% url 'modes_list' %}"> View Ambiance Modes ></a></p>
+    <p><a href="{% url 'automations_list' %}"> View Routines ></a></p>
+    <p><a href="{% url 'ds_main' %}"> Device Sharing Platform ></a></p>
+    <a href="{% url 'my_guests' %}">My Guests ></a>
+    <p><a href="{% url 'settings' %}"> Settings ></a></p>
+
+
+</body>
+</html>

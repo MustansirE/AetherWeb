@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>{{ mode.name }} - Mode Details</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+</head>
+<body>
+    <h2>Mode Details: {{ mode.name }}</h2> 
+
+    <p><strong>Room:</strong> {{ mode.room.name }}</p>
+    <ul>
+        {% if mode.devices.exists %}
+            {% for mode_device in mode.devices.all %}
+                <li>
+                    <strong>{{ mode_device.device.name }}</strong> <br>
+                    {% if mode_device.device.general_product_code == 'AF0005' %}
+                       {{ mode_device.state }}<br>
+                    {% elif mode_device.device.general_product_code == 'AF0003' %}
+                       {{ mode_device.state }}<br>
+                    {% elif mode_device.device.general_product_code == 'LF0002' %}
+                       {{ mode_device.state }}<br>
+                    {% elif mode_device.device.general_product_code == 'AV0001' %}
+                        Temperature: {{ mode_device.state }}°C<br>
+                    {% endif %}
+                </li>
+            {% endfor %}
+        {% else %}
+            <li>No devices set for this mode.</li>
+        {% endif %}
+    </ul>
+
+        <form action="{% url 'edit_ambiance_mode' mode.id %}" method="get" style="display:inline;">
+            {% csrf_token %}
+            <button type="submit">Edit Mode</button>
+        </form>
+        <br>
+        <form action="{% url 'delete_ambiance_mode' mode.id %}" method="post" style="display:inline;">
+            {% csrf_token %}
+            <button type="submit">Delete Mode</button>
+        </form>
+
+    <p><a href="{% url 'modes_list' %}">Back to Modes</a></p>
+</body>
+</html>

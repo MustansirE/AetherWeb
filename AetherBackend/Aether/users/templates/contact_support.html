@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Contact Support</title>
+</head>
+<body>
+    <h1>Contact Support</h1>
+    
+    <p>If you have any questions or need assistance, please send us a message.</p>
+
+    {% if success %}
+        <p>{{ success }}</p>
+    {% endif %}
+
+    <form method="post">
+        {% csrf_token %}
+        <label for="message">Your Message:</label><br>
+        <textarea id="message" name="message" rows="4" cols="50" required></textarea><br>
+        <button type="submit">Send Message</button>
+    </form>
+
+    <p> <a href="{% url 'settings' %}"> Back to Settings </a> </p>
+</body>
+</html>
