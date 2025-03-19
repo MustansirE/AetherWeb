@@ -534,14 +534,6 @@ def logout_view(request):
 
 @login_required
 def guest_logout_view(request):
-    try:
-        guest = Guest.objects.get(user=request.user)
-        guest_user = request.user
-        guest.delete()
-        guest_user.delete()
-    except Guest.DoesNotExist:
-        pass  
-    
     logout(request)
     return redirect('start')
 
