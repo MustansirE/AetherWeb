@@ -15,6 +15,7 @@ import { MyGuestPage } from './pages/MyGuestPage'
 import { SettingsPage } from './pages/SettingsPage'
 import { DeviceInfoPage } from './pages/DeviceInfoPage'
 import { GuestHomePage } from './pages/GuestHomePage'
+import { TutorialPage } from './pages/Tutorial'
 
 function App() {
   return (
@@ -23,6 +24,7 @@ function App() {
         <Route path="/" element={<LandingPage />} />
         <Route path="/login" element={<LoginPage />} />
         <Route path="/signup" element={<SignupPage />} />
+        <Route path="/tutorial" element={<TutorialPage />} />
         <Route path="/guest-login" element={<GuestLoginPage />} />
         <Route path="/guest-dashboard" element={<GuestHomePage />} />
         

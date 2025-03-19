@@ -273,21 +273,45 @@ export function EnergyStatsPage() {
     return item.month === prevMonthIndex + 1;
   });
 
-  const electricityChange = currentMonthData && prevMonthData
-    ? ((currentMonthData.usage - prevMonthData.usage) / prevMonthData.usage) * 100
-    : 0;
-  const waterChange = electricityChange; // Simulate water and gas changes
+  // Update the electricityChange calculation
+  const calculateElectricityChange = () => {
+    if (energyData.length < 2) return 0;
+
+    const sortedData = [...energyData];
+    const currentUsage = sortedData[sortedData.length - 1].usage;
+    const previousUsage = sortedData[sortedData.length - 2].usage;
+
+    return previousUsage === 0 ? 0 : ((currentUsage - previousUsage) / previousUsage) * 100;
+  };
+  const getMostRecentUsage = () => {
+    if (energyData.length === 0) return 0;
+    const sortedData = [...energyData];
+    return sortedData[sortedData.length - 1].usage;
+  };
+
+  const getElectricityUnit = () => {
+    switch (timeRange) {
+      case 'hourly':
+        return 'kWh';
+      case 'daily':
+      case 'monthly':
+      case 'yearly':
+      default:
+        return 'kWh';
+    }
+  };
+
+  // Then use this in your component:
+  const electricityChange = calculateElectricityChange();
+  const mostRecentElectricity = getMostRecentUsage();
+
+  // Keep the same water and gas calculations but use the most recent electricity value
+  const waterUsage = mostRecentElectricity * 0.075; // Same 0.075 multiplier as before
+  const gasUsage = mostRecentElectricity * 0.007; // Same 0.007 multiplier as before
+
+  // Water and gas would use the same change percentage as electricity
+  const waterChange = electricityChange;
   const gasChange = electricityChange;
-
-
-  const staticElectricityUsage = 120.5; // Example: 120.5 kWh
-  const staticElectricityChange = -2.5; // Example: -2.5% change
-
-  const staticGasUsage = 75.3; // Example: 75.3 m³
-  const staticGasChange = 1.8; // Example: 1.8% change
-
-  const staticWaterUsage = 250.0; // Example: 250.0 gal
-  const staticWaterChange = -0.5; // Example: -0.5% change
 
   return (
     <div className="space-y-6 animate-fade-in">
@@ -302,7 +326,7 @@ export function EnergyStatsPage() {
         <SummaryCard
           title="Electricity"
           icon={Zap}
-          value={`${currentMonthData?.usage.toFixed(0) ?? '0.00'} kWh`} // Show current month's usage
+          value={`${getMostRecentUsage().toFixed(1)} ${getElectricityUnit()}`}
           change={electricityChange}
           color="#EAAC82"
         />
@@ -311,7 +335,7 @@ export function EnergyStatsPage() {
         <SummaryCard
           title="Water"
           icon={Droplets}
-          value={`${((currentMonthData?.usage ?? 0) * 0.075).toFixed(0)} gal`} // Multiply electricity by 0.75
+          value={`${waterUsage.toFixed(1)} gal`}
           change={waterChange}
           color="#90AC95"
         />
@@ -320,7 +344,7 @@ export function EnergyStatsPage() {
         <SummaryCard
           title="Gas"
           icon={Flame}
-          value={`${((currentMonthData?.usage ?? 0) * 0.007).toFixed(2)} m³`} // Multiply electricity by 0.5
+          value={`${gasUsage.toFixed(2)} m³`}
           change={gasChange}
           color="#7A9580"
         />

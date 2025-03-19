@@ -12,7 +12,7 @@ class Command(BaseCommand):
     help = 'Generates sample data for energy usage'
 
     def handle(self, *args, **kwargs):
-        user = Owner.objects.get(user__email='moram@email.com')
+        user = Owner.objects.get(user__email='janedoe@email.com')
         today = timezone.now().date()
 
         # Generate DeviceEnergyUsage for each device

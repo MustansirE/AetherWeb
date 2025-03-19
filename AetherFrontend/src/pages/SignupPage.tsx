@@ -38,7 +38,7 @@ export function SignupPage() {
 
       if (response.status === 201) {
         localStorage.setItem('access_token', response.data.access_token);
-        navigate('/dashboard');
+        navigate('/tutorial');
       }
     } catch (error:any) {
       const message = error.response?.data?.error || error.message;
