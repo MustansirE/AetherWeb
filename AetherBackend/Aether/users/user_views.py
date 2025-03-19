@@ -1,6 +1,7 @@
 import json
 from pyexpat.errors import messages
 import random
+from django.utils.crypto import get_random_string
 from django.db import IntegrityError, transaction
 from django.http import JsonResponse
 from django.shortcuts import get_object_or_404, render, redirect
@@ -74,6 +75,67 @@ def signup(request):
                 house_id=owner.house_id
             )
             house.save()
+            
+            # add an 'All' room
+            # in 'All' add thermostat and Monitor devices 
+            room = Room.objects.create(name='All', house=house, room_id=get_random_string(8), room_number=1)
+            room.save()
+            
+            device_id = generate_unique_code()
+            while room.devices.filter(device_id=device_id).exists():  
+                device_id = generate_unique_code()
+            thermostat = Device(device_id=device_id, name="Thermostat", general_product_code="AV0001", manufacturer="Aether", average_energy_consumption_per_hour=0.03, status='on', room=room, device_number=1)
+            thermostat.save()
+            VariableOptionDevice.objects.create(device=thermostat, state=22)
+            
+            device_id = generate_unique_code()
+            while room.devices.filter(device_id=device_id).exists():  
+                device_id = generate_unique_code()
+            watermonitor = Device(device_id=device_id, name="Water Monitoring System", general_product_code="MY0001", manufacturer="Aether", average_energy_consumption_per_hour=0.01, status='on', room=room, device_number=1)
+            watermonitor.save()
+            MonitorFixedDevice.objects.create(device=watermonitor, options=["secure", "detects a leak!"], state="secure")
+            
+            device_id = generate_unique_code()
+            while room.devices.filter(device_id=device_id).exists():  
+                device_id = generate_unique_code()
+            motionsensor = Device(device_id=device_id, name="Motion Sensor", general_product_code="MY0002", manufacturer="Aether", average_energy_consumption_per_hour=0.0025, status='on', room=room, device_number=1)
+            motionsensor.save()
+            MonitorFixedDevice.objects.create(device=motionsensor, options=["idle", "triggered"], state="idle")
+            
+            device_id = generate_unique_code()
+            while room.devices.filter(device_id=device_id).exists():  
+                device_id = generate_unique_code()
+            pestdetector = Device(device_id=device_id, name="Pest Detector", general_product_code="SY0001", manufacturer="Aether", average_energy_consumption_per_hour=0.001, status='on', room=room, device_number=1)
+            pestdetector.save()
+            MonitorFixedDevice.objects.create(device=pestdetector, options=["safe", "detects a pest!"], state="safe")
+            
+            device_id = generate_unique_code()
+            while room.devices.filter(device_id=device_id).exists():  
+                device_id = generate_unique_code()
+            waterhardnesstester = Device(device_id=device_id, name="Water Hardness Tester", general_product_code="SZ0002", manufacturer="Aether", average_energy_consumption_per_hour=0.001, status='on', room=room, device_number=1)
+            waterhardnesstester.save()
+            MonitorVariableDevice.objects.create(device=waterhardnesstester, state=0)
+        
+            device_id = generate_unique_code()
+            while room.devices.filter(device_id=device_id).exists():  
+                device_id = generate_unique_code()
+            lightintensity = Device(device_id=device_id, name="Light Intensity Sensor", general_product_code="MZ0005", manufacturer="Aether", average_energy_consumption_per_hour=0.0025, status='on', room=room, device_number=1)
+            lightintensity.save()
+            MonitorVariableDevice.objects.create(device=lightintensity, state=0)
+        
+            device_id = generate_unique_code()
+            while room.devices.filter(device_id=device_id).exists():  
+                device_id = generate_unique_code()
+            humidity = Device(device_id=device_id, name="Humidity Sensor", general_product_code="MZ0004", manufacturer="Aether", average_energy_consumption_per_hour=0.0025, status='on', room=room, device_number=1)
+            humidity.save()
+            MonitorVariableDevice.objects.create(device=humidity, state=0)
+            
+            device_id = generate_unique_code()
+            while room.devices.filter(device_id=device_id).exists():  
+                device_id = generate_unique_code()
+            tempsensor = Device(device_id=device_id, name="Temperature Sensor", general_product_code="MZ0003", manufacturer="Aether", average_energy_consumption_per_hour=0.0025, status='on', room=room, device_number=1)
+            tempsensor.save()
+            MonitorVariableDevice.objects.create(device=tempsensor, state=0)
             
             refresh = RefreshToken.for_user(user)
             return Response({
