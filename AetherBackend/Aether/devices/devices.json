@@ -56,13 +56,26 @@
 
     {
         "name": "Sprinkler",
-        "general_product_code": "OT0001",
+        "general_product_code": "OT0002",
         "average_energy_consumption_per_hour": 0.02,
         "manufacturer": "Aether"
     },
     {
         "name": "Privacy Glass",
-        "general_product_code": "OT0002",
+        "general_product_code": "OT0001",
+        "average_energy_consumption_per_hour": 0.01,
+        "manufacturer": "Aether"
+    },
+    {
+        "name": "Smart Solar Panels",
+        "options": ["blinking", "regular"],
+        "general_product_code": "OT0003",
+        "average_energy_consumption_per_hour": 0.00,
+        "manufacturer": "Aether"
+    },
+    {
+        "name": "Garden Lights",
+        "general_product_code": "OF0004",
         "average_energy_consumption_per_hour": 0.01,
         "manufacturer": "Aether"
     },
@@ -173,19 +186,19 @@
         "manufacturer": "Aether"
     },
     {
-        "name": "Outdoor Movie Night Set",
+        "name": "Movie Night Kit",
         "general_product_code": "ST0004",
         "average_energy_consumption_per_hour": 2.5,
         "manufacturer": "Aether"
     },
     {
-        "name": "Stargazer Tools",
+        "name": "Stargazing Kit",
         "general_product_code": "ST0005",
         "average_energy_consumption_per_hour": 1.2,
         "manufacturer": "Aether"
     },
     {
-        "name": "Home Spa",
+        "name": "Home Spa Kit",
         "general_product_code": "ST0006",
         "average_energy_consumption_per_hour": 2.1,
         "manufacturer": "Aether"

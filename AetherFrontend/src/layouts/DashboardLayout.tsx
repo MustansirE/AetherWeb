@@ -18,6 +18,7 @@ import {
 } from 'lucide-react';
 import { cn } from '../utils/cn';
 import { CustomLogo } from '../components/CustomLogo';
+import axios from 'axios';
 
 const navigation = [
   { name: 'Home', icon: Home, to: '/dashboard' },
@@ -39,38 +40,70 @@ export function DashboardLayout() {
   const [notifications, setNotifications] = useState([]); // Store notifications
   const [isNotificationsModalOpen, setIsNotificationsModalOpen] = useState(false); // Modal state
 
-  // Fetch user data
-  useEffect(() => {
-    const fetchUserName = async () => {
-      try {
-        const token = localStorage.getItem('access_token');
-        if (!token) {
-          console.error('No token found, please log in');
-          navigate('/');
-          return;
-        }
-
-        const response = await fetch('http://127.0.0.1:8000/me/', {
-          method: 'GET',
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${token}`,
-          },
-        });
-
-        if (response.ok) {
-          const data = await response.json();
-          setUserName(data.name); // Assuming the response has a `name` field
-        } else {
-          console.error('Failed to fetch user data:', response.status);
-        }
-      } catch (error) {
-        console.error('Error fetching user data:', error);
+// DashboardLayout.tsx
+useEffect(() => {
+  const fetchUserName = async () => {
+    try {
+      const token = localStorage.getItem('access_token');
+      if (!token) {
+        console.error('No token found, please log in');
+        navigate('/');
+        return;
       }
-    };
 
-    fetchUserName();
-  }, [navigate]);
+      const response = await fetch('http://127.0.0.1:8000/me/', {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`,
+        },
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        setUserName(data.name);
+      } else {
+        console.error('Failed to fetch user data:', response.status);
+      }
+    } catch (error) {
+      console.error('Error fetching user data:', error);
+    }
+  };
+
+  // Add axios interceptor for token refresh
+  const interceptor = axios.interceptors.response.use(
+    (response) => response,
+    async (error) => {
+      const originalRequest = error.config;
+      if (error.response.status === 401 && !originalRequest._retry) {
+        originalRequest._retry = true;
+        const refreshToken = localStorage.getItem('refresh_token');
+        if (refreshToken) {
+          try {
+            const { data } = await axios.post('http://127.0.0.1:8000/api/token/refresh/', {
+              refresh: refreshToken,
+            });
+            localStorage.setItem('access_token', data.access);
+            axios.defaults.headers.common['Authorization'] = `Bearer ${data.access}`;
+            return axios(originalRequest);
+          } catch (err) {
+            localStorage.removeItem('access_token');
+            localStorage.removeItem('refresh_token');
+            navigate('/');
+          }
+        }
+      }
+      return Promise.reject(error);
+    }
+  );
+
+  fetchUserName();
+
+  // Cleanup interceptor
+  return () => {
+    axios.interceptors.response.eject(interceptor);
+  };
+}, [navigate]);
 
   // Fetch notifications
   const fetchNotifications = async () => {
@@ -108,33 +141,34 @@ export function DashboardLayout() {
     }
   };
 
-  // Handle logout
-  const handleLogout = async () => {
-    try {
-      const token = localStorage.getItem('access_token');
-      if (!token) {
-        console.error('No token found, please log in');
-        return;
-      }
-
-      const response = await fetch('http://127.0.0.1:8000/logout/', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`,
-        },
-      });
-
-      if (response.ok) {
-        localStorage.removeItem('access_token');
-        navigate('/');
-      } else {
-        console.error('Logout failed:', response.status);
-      }
-    } catch (error) {
-      console.error('Error during logout:', error);
+// DashboardLayout.tsx
+const handleLogout = async () => {
+  try {
+    const token = localStorage.getItem('access_token');
+    if (!token) {
+      console.error('No token found, please log in');
+      return;
     }
-  };
+
+    const response = await fetch('http://127.0.0.1:8000/logout/', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`,
+      },
+    });
+
+    if (response.ok) {
+      localStorage.removeItem('access_token');
+      localStorage.removeItem('refresh_token');  
+      navigate('/');
+    } else {
+      console.error('Logout failed:', response.status);
+    }
+  } catch (error) {
+    console.error('Error during logout:', error);
+  }
+};
 
   return (
     <div className="min-h-screen bg-[#1A1A1A] flex">

@@ -168,6 +168,24 @@ REST_FRAMEWORK = {
     ],
 }
 
+'''
+from datetime import timedelta
 
+SIMPLE_JWT = {
+    "ACCESS_TOKEN_LIFETIME": timedelta(days=7),  
+    "REFRESH_TOKEN_LIFETIME": timedelta(days=30),
+    "ROTATE_REFRESH_TOKENS": True,
+    "BLACKLIST_AFTER_ROTATION": True,
+    "AUTH_HEADER_TYPES": ("Bearer",),
+}
+'''
 
+# settings.py
+from datetime import timedelta
 
+SIMPLE_JWT = {
+    'ACCESS_TOKEN_LIFETIME': timedelta(hours=12),  # Extend access token lifetime to 1 hour
+    'REFRESH_TOKEN_LIFETIME': timedelta(days=30),  # Extend refresh token lifetime to 7 days
+    'ROTATE_REFRESH_TOKENS': True,  # Automatically refresh tokens when they expire
+    'BLACKLIST_AFTER_ROTATION': True,  # Blacklist old tokens after rotation
+}

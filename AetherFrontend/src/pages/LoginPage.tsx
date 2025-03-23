@@ -24,6 +24,7 @@ export function LoginPage() {
   
       if (response.ok) {
         localStorage.setItem('access_token', data.access_token);
+        localStorage.setItem('refresh_token', data.refresh_token);
         console.log('Login successful!');
         navigate('/dashboard');  
       } else {
