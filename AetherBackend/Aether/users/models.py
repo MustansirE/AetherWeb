@@ -22,5 +22,25 @@ class Guest(models.Model):
         return f"Guest of {self.owner.user.first_name}: {self.user.first_name} {self.user.last_name if self.user else ''}"
 
 
+import uuid
+from django.db import models
+from django.contrib.auth.models import User
+from django.utils import timezone
+from datetime import timedelta
+
+class EmailVerificationToken(models.Model):
+    user = models.OneToOneField(User, on_delete=models.CASCADE)
+    token = models.UUIDField(default=uuid.uuid4, editable=False)
+    created_at = models.DateTimeField(auto_now_add=True)
+    expires_at = models.DateTimeField()
+    is_verified = models.BooleanField(default=False)
+
+    def save(self, *args, **kwargs):
+        if not self.expires_at:
+            self.expires_at = timezone.now() + timedelta(days=2)  # Token expires in 2 days
+        super().save(*args, **kwargs)
+
+    def is_valid(self):
+        return not self.is_verified and timezone.now() <= self.expires_at
 
 

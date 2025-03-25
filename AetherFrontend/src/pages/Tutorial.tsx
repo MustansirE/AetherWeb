@@ -66,26 +66,18 @@ export function TutorialPage() {
     const prevStep = () => {
         setCurrentStep(prev => (prev - 1 + tutorialSteps.length) % tutorialSteps.length);
     };
-
-    if (!showTutorial) return null;
     
     return (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 animate-fade-in">
             <div className="bg-[#262626] rounded-xl w-16/17 max-w-7xl relative h-6/7 flex flex-col">
                 <div className="flex justify-between items-center px-6 py-5 border-b border-gray-700">
                     <h1 className="text-2xl font-semibold text-[#8DA08E]">Tutorial</h1>
-                    <button
-                        onClick={() => setShowTutorial(false)}
-                        className="text-gray-400 hover:text-white p-2 rounded-lg hover-pulse"
-                    >
-                        <X className="w-6 h-6" />
-                    </button>
                 </div>
                 
                 <div className="relative flex-1 overflow-hidden">
                     <button
                         onClick={prevStep}
-                        className="absolute left-4 top-1/2 -translate-y-1/2 bg-[#262626] text-white p-3 rounded-full hover:bg-[#8DA08E] transition-colors z-10 shadow-lg"
+                        className="absolute left-4 top-1/2 -translate-y-1/2 bg-[#8DA08E] hover:bg-[#7A9580] text-white p-3 rounded-full  transition-colors z-10 shadow-lg"
                         disabled={currentStep === 0}
                     >
                         <ChevronLeft className="w-6 h-6" />
@@ -93,7 +85,7 @@ export function TutorialPage() {
                     
                     <button
                         onClick={nextStep}
-                        className="absolute right-4 top-1/2 -translate-y-1/2 bg-[#262626] text-white p-3 rounded-full hover:bg-[#8DA08E] transition-colors z-10 shadow-lg"
+                        className="absolute right-4 top-1/2 -translate-y-1/2 bg-[#8DA08E] hover:bg-[#7A9580] text-white p-3 rounded-full transition-colors z-10 shadow-lg"
                         disabled={currentStep === tutorialSteps.length - 1}
                     >
                         <ChevronRight className="w-6 h-6" />
@@ -124,12 +116,14 @@ export function TutorialPage() {
                     <div className="text-gray-400">
                         Step {currentStep + 1} of {tutorialSteps.length}
                     </div>
-                    <button
-                        onClick={() => navigate('/dashboard')}
-                        className="bg-[#8DA08E] hover:bg-[#7A9580] text-white px-8 py-2.5 rounded-lg hover-pulse font-medium"
-                    >
-                        Get Started
-                    </button>
+                    {currentStep === tutorialSteps.length - 1 && (
+                        <button
+                            onClick={() => navigate('/dashboard')}
+                            className="bg-[#8DA08E] hover:bg-[#7A9580] text-white px-8 py-2.5 rounded-lg hover-pulse font-medium"
+                        >
+                            Get Started
+                        </button>
+                    )}
                 </div>
             </div>
         </div>

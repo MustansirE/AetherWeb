@@ -4,7 +4,7 @@ import { ChevronUp, ChevronDown } from 'lucide-react';
 interface ThermostatControlProps {
   state: number; // Current thermostat state (temperature)
   minTemp?: number; // Minimum temperature (default: 16)
-  maxTemp?: number; // Maximum temperature (default: 30)
+  maxTemp?: number; // Maximum temperature (default: 32)
   isHeating: boolean; // Whether the thermostat is in heating mode
   onIncrease: () => void; // Function to call when increasing temperature
   onDecrease: () => void; // Function to call when decreasing temperature
@@ -13,7 +13,7 @@ interface ThermostatControlProps {
 export function ThermostatControl({
   state = 22,
   minTemp = 16,
-  maxTemp = 30,
+  maxTemp = 32,
   isHeating = false,
   onIncrease,
   onDecrease,

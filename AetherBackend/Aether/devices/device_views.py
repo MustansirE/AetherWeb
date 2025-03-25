@@ -371,10 +371,10 @@ def adjust_thermostat(request):
             thermostat.state += 1
 
         # Ensure the state stays within valid bounds (e.g., 10°C to 30°C)
-        if thermostat.state < 10:  # Minimum temperature
-            thermostat.state = 10
-        elif thermostat.state > 30:  # Maximum temperature
-            thermostat.state = 30
+        if thermostat.state < 16:  # Minimum temperature
+            thermostat.state = 16
+        elif thermostat.state > 32:  # Maximum temperature
+            thermostat.state = 32
 
         # Save the updated state
         thermostat.save()

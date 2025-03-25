@@ -38,12 +38,17 @@ class IntervalReading(models.Model):
     def __str__(self):
         return f"Reading for Device {self.device_id} from {self.start} to {self.end} - {self.usage} kWh"
 
+# energy/models.py
 class CommunityEvent(models.Model):
     name = models.CharField(max_length=255)
     description = models.TextField()
     date = models.DateField()
-    joined = models.BooleanField(default=False)  
+    time = models.TimeField(null=True, blank=True)
+    participants = models.ManyToManyField(
+        Owner, 
+        related_name='joined_events',
+        blank=True
+    )
 
     def __str__(self):
-        return f"{self.name} - {'Joined' if self.joined else 'Not Joined'}"
-
+        return self.name

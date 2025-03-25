@@ -17,6 +17,16 @@ import {
   Brush,
   RecycleIcon
 } from 'lucide-react';
+
+interface CommunityEvent {
+  id: number;
+  name: string;
+  description: string;
+  date: string; // Will be formatted from Date object
+  time: string | null; // Time can be null
+  joined?: boolean;
+}
+
 import { ThermostatControl } from '../components/ThermostatControl';
 
 export function HomePage() {
@@ -32,7 +42,8 @@ export function HomePage() {
   const [percentageUsed, setPercentageUsed] = useState(0);
   const [isEditingGoal, setIsEditingGoal] = useState(false);
   const [newGoal, setNewGoal] = useState('');
-  const [joinedEvents, setJoinedEvents] = useState<{ [key: string]: boolean }>({});
+  const [communityEvents, setCommunityEvents] = useState<CommunityEvent[]>([]);
+  const [joinedEvents, setJoinedEvents] = useState<{ [key: number]: boolean }>({});
 
   // Fetch initial data when the page loads
   useEffect(() => {
@@ -73,6 +84,45 @@ export function HomePage() {
     fetchInitialData();
   }, []);
 
+  const [events, setEvents] = useState<CommunityEvent[]>([]);
+
+  useEffect(() => {
+    const fetchEvents = async () => {
+      try {
+        const token = localStorage.getItem('access_token');
+        if (!token) throw new Error('No token found');
+  
+        const response = await fetch('http://localhost:8000/event_list/', {
+          headers: {
+            'Authorization': `Bearer ${token}`,
+          },
+        });
+  
+        if (!response.ok) throw new Error('Failed to fetch events');
+  
+        const data: CommunityEvent[] = await response.json();
+        const formattedEvents = data.map(event => ({
+          ...event,
+          date: new Date(event.date).toLocaleDateString(),
+          time: event.time ? event.time.substring(0, 5) : null
+        }));
+  
+        setCommunityEvents(formattedEvents);
+  
+        // Initialize joined status
+        const initialJoinedStatus: { [key: number]: boolean } = {};
+        formattedEvents.forEach(event => {
+          initialJoinedStatus[event.id] = event.joined || false;
+        });
+        setJoinedEvents(initialJoinedStatus);
+      } catch (error) {
+        console.error('Error fetching events:', error);
+      }
+    };
+  
+    fetchEvents();
+  }, []);
+
   // Fetch energy goal and today's usage
   useEffect(() => {
     const fetchData = async () => {
@@ -106,20 +156,6 @@ export function HomePage() {
 
     fetchData();
   }, []);
-
-  const toggleJoinEvent = (eventTitle: string) => {
-    setJoinedEvents((prev) => ({
-      ...prev,
-      [eventTitle]: !prev[eventTitle], // Toggle state
-    }));
-  };
-
-  const communityEvents = [
-    { icon: <LightbulbOff className="h-6 w-6 text-[#EAAC82]" />, title: "Lights Off Sunday", date: "Mar 30", time: "7:30 PM" },
-    { icon: <CakeSlice className="h-6 w-6 text-[#EAAC82]" />, title: "Morams Birthday", date: "Apr 3", time: "12:00 AM" },
-    { icon: <RecycleIcon className="h-6 w-6 text-[#EAAC82]" />, title: "Park Clean-Up", date: "Apr 8", time: "11:00 AM" },
-    { icon: <Speaker className="h-6 w-6 text-[#EAAC82]" />, title: "Silent Friday", date: "Apr 12", time: "9:00 AM" },
-  ];
 
   // Handle goal update
   const handleUpdateGoal = async () => {
@@ -180,6 +216,38 @@ export function HomePage() {
     }
   };
 
+  const toggleJoin = async (eventId: number) => {
+    try {
+      const token = localStorage.getItem('access_token');
+      if (!token) throw new Error('No token found');
+
+      const response = await fetch(`http://localhost:8000/toggle_event_join/${eventId}/`, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        },
+      });
+
+      if (response.ok) {
+        setJoinedEvents(prev => ({
+          ...prev,
+          [eventId]: !prev[eventId]
+        }));
+      }
+    } catch (err) {
+      console.error('Join toggle failed:', err);
+    }
+  };
+
+  const eventIcons: { [key: string]: JSX.Element } = {
+    'Lights Off!': <LightbulbOff className="h-6 w-6 text-[#EAAC82]" />,
+    'Less water usage': <Droplets className="h-6 w-6 text-[#EAAC82]" />,
+    'Lights Off Sunday': <LightbulbOff className="h-6 w-6 text-[#EAAC82]" />,
+    'Morams Birthday': <CakeSlice className="h-6 w-6 text-[#EAAC82]" />,
+    'Park Clean-Up': <RecycleIcon className="h-6 w-6 text-[#EAAC82]" />,
+    'Silent Friday': <Speaker className="h-6 w-6 text-[#EAAC82]" />
+  };
   return (
     <div className="max-w-[1400px] mx-auto space-y-8 animate-fade-in">
       {/* Main Controls Section */}
@@ -313,18 +381,18 @@ export function HomePage() {
             <span>Upcoming Community Events</span>
           </h2>
           <div className="flex overflow-x-auto space-x-4 pb-4">
-            {communityEvents.map((event, index) => (
-              <div key={index} className="flex-shrink-0 glass-card rounded-lg p-4 w-48">
-                <div className="mb-2">{event.icon}</div>
-                <h3 className="text-sm font-semibold text-white">{event.title}</h3>
+            {communityEvents.map((event) => (
+              <div key={event.id} className="flex-shrink-0 glass-card rounded-lg p-4 w-48">
+                <div className="mb-2">{eventIcons[event.name]}</div>
+                <h3 className="text-sm font-semibold text-white">{event.name}</h3>
                 <p className="text-xs text-gray-400">{event.date}</p>
                 <p className="text-xs text-gray-400">{event.time}</p>
                 <button
-                  onClick={() => toggleJoinEvent(event.title)}
-                  className={`w-full mt-2 px-3 py-1 text-white rounded-lg transition-colors ${joinedEvents[event.title] ? "bg-gray-500 hover:bg-gray-400" : "bg-[#EAAC82] hover:bg-[#D8946F]"
+                  onClick={() => toggleJoin(event.id)}
+                  className={`w-full mt-2 px-3 py-1 text-white rounded-lg transition-colors ${joinedEvents[event.id] ? "bg-gray-500 hover:bg-gray-400" : "bg-[#EAAC82] hover:bg-[#D8946F]"
                     }`}
                 >
-                  {joinedEvents[event.title] ? "Unjoin" : "Join"}
+                  {joinedEvents[event.id] ? "Unjoin" : "Join"}
                 </button>
               </div>
             ))}
@@ -368,3 +436,4 @@ function StatCard({
     </div>
   );
 }
+

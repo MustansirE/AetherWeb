@@ -89,7 +89,7 @@ def room_devices(request, room_id):
 
     # Get only supported devices in the room
     devices = room.devices.filter(
-        general_product_code__in=['AF0005', 'AF0003', 'LF0002', 'AV0001']
+        general_product_code__in=['AF0005', 'AF0003', 'LF0002', 'AV0001'] 
     )
 
     # Structure the response

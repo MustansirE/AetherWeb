@@ -18,6 +18,7 @@ from django.utils import timezone
 from django.db.models import Sum
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated
+from django.views.decorators.csrf import csrf_exempt
 import logging
 
 @login_required
@@ -494,3 +495,48 @@ def projected_bills(request):
     except Exception as e:
         logger.error(f"Error calculating projected bills: {str(e)}")
         return JsonResponse({'error': str(e)}, status=500)
+    
+
+# Add these imports at the top if not already present
+from rest_framework.response import Response
+from rest_framework import status
+
+# energy/views.py
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def toggle_event_join(request, event_id):
+    try:
+        event = CommunityEvent.objects.get(id=event_id)
+        user = request.user.owner
+        
+        # Toggle participation
+        if event.participants.filter(id=user.id).exists():
+            event.participants.remove(user)
+            joined = False
+        else:
+            event.participants.add(user)
+            joined = True
+            
+        return Response({
+            'status': 'success',
+            'event_id': event.id,
+            'joined': joined,
+            'participants_count': event.participants.count()
+        })
+        
+    except CommunityEvent.DoesNotExist:
+        return Response({'error': 'Event not found'}, status=404)
+    except Exception as e:
+        return Response({'error': str(e)}, status=500)
+    
+from django.db.models import Exists, OuterRef
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def event_list(request):
+    events = CommunityEvent.objects.annotate(
+        joined=Exists(request.user.owner.joined_events.filter(id=OuterRef('id')))
+    ).values(
+        'id', 'name', 'description', 'date', 'time', 'joined'
+    )
+    return Response(list(events))
