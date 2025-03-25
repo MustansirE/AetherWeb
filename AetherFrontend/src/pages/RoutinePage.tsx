@@ -305,17 +305,31 @@ export function RoutinePage() {
   };
 
   // Helper function to check if the current time is within the automation's time slot
+  // Replace the existing isAutomationActive function with this:
   const isAutomationActive = (startTime: string, endTime: string): boolean => {
     const now = new Date();
-    const currentTime = now.getHours() * 60 + now.getMinutes(); // Convert current time to minutes
+    const currentHours = now.getHours();
+    const currentMinutes = now.getMinutes();
 
+    // Parse start time
     const [startHour, startMinute] = startTime.split(':').map(Number);
+    const startDate = new Date();
+    startDate.setHours(startHour, startMinute, 0, 0);
+
+    // Parse end time
     const [endHour, endMinute] = endTime.split(':').map(Number);
+    const endDate = new Date();
+    endDate.setHours(endHour, endMinute, 0, 0);
 
-    const startTotal = startHour * 60 + startMinute; // Convert start time to minutes
-    const endTotal = endHour * 60 + endMinute; // Convert end time to minutes
+    // Handle overnight ranges (e.g., 23:30 - 00:30)
+    if (endDate <= startDate) {
+      endDate.setDate(endDate.getDate() + 1);
+      if (now >= startDate || now <= endDate) {
+        return true;
+      }
+    }
 
-    return currentTime >= startTotal && currentTime <= endTotal;
+    return now >= startDate && now <= endDate;
   };
 
 

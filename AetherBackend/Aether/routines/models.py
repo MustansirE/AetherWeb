@@ -7,6 +7,8 @@ class Automation(models.Model):
     start_time = models.TimeField(default='00:00') # Start time for the routine
     end_time = models.TimeField(default='00:01')  # End time for the routine with a default value
     status = models.BooleanField(default=False)  # Active/inactive status
+    is_running = models.BooleanField(default=False)  # Add this field
+    last_triggered = models.DateTimeField(null=True, blank=True)
 
     def __str__(self):
         return f"Automation: {self.name} (House: {self.house.house_id})"

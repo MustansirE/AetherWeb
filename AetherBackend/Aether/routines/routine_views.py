@@ -84,15 +84,17 @@ def automations_list(request):
                 for ad in automation_devices
             ]
 
-            automations_data.append({
-                "id": str(automation.id),
-                "name": automation.name,
-                "startTime": automation.start_time.strftime('%H:%M'),  # Format time as string
-                "endTime": automation.end_time.strftime('%H:%M'),  # Format time as string
-                "status": automation.status,
-                "isActive": is_automation_active(automation.start_time, automation.end_time),  # Add isActive field
-                "devices": devices_data,
-            })
+        # views.py (in automations_list)
+        # Change the isActive field to use is_running
+        automations_data.append({
+            "id": str(automation.id),
+            "name": automation.name,
+            "startTime": automation.start_time.strftime('%H:%M'),
+            "endTime": automation.end_time.strftime('%H:%M'),
+            "status": automation.status,
+            "isActive": automation.is_running,  # Changed here
+            "devices": devices_data,
+        })
 
         print(automations_data)  # Debugging: Log the automations data
         return JsonResponse({"automations": automations_data}, status=200)
@@ -251,8 +253,17 @@ def toggle_automation(request, automation_id):
     try:
         automation = get_object_or_404(Automation, id=automation_id)
         automation.status = not automation.status
+        
+        # Immediate execution for manual toggling
+        if automation.status:
+            execute_automation(automation, activate=True)
+            automation.is_running = True
+        else:
+            execute_automation(automation, activate=False)
+            automation.is_running = False
+            
         automation.save()
-        print("Automation toggled succesfully!")
+        print("Automation started!")
         return JsonResponse({
             "message": "Automation toggled successfully",
             "newStatus": automation.status
@@ -275,3 +286,81 @@ def delete_automation(request, automation_id):
         logger.error(f"Error deleting automation: {e}", exc_info=True)
         return JsonResponse({"error": "Internal Server Error"}, status=500)
 
+
+# automation_scheduler.py
+from apscheduler.schedulers.background import BackgroundScheduler
+from django_apscheduler.jobstores import DjangoJobStore
+from django.utils import timezone
+from .models import Automation, AutomationDevice
+from devices.models import FixedOptionDevice, VariableOptionDevice
+
+def execute_automation(automation, activate=True):
+    for automation_device in automation.devices.all():
+        device = automation_device.device
+        
+        if activate:
+            # Store original state
+            automation_device.prev_status = device.status
+            if hasattr(device, 'fixedoptiondevice'):
+                automation_device.prev_state = device.fixedoptiondevice.state
+            elif hasattr(device, 'variableoptiondevice'):
+                automation_device.prev_state = str(device.variableoptiondevice.state)
+            automation_device.save()
+
+            # Apply new state
+            if automation_device.state:
+                if hasattr(device, 'fixedoptiondevice'):
+                    device.fixedoptiondevice.state = automation_device.state
+                    device.fixedoptiondevice.save()
+                elif hasattr(device, 'variableoptiondevice'):
+                    device.variableoptiondevice.state = automation_device.state
+                    device.variableoptiondevice.save()
+            
+            device.status = automation_device.status
+            device.save()
+        else:
+            # Restore original state
+            if automation_device.prev_state:
+                if hasattr(device, 'fixedoptiondevice'):
+                    device.fixedoptiondevice.state = automation_device.prev_state
+                    device.fixedoptiondevice.save()
+                elif hasattr(device, 'variableoptiondevice'):
+                    device.variableoptiondevice.state = automation_device.prev_state
+                    device.variableoptiondevice.save()
+            
+            device.status = automation_device.prev_status
+            device.save()
+
+def check_automations():
+    now = timezone.now().time()
+    for automation in Automation.objects.filter(status=True):
+        try:
+            start = automation.start_time
+            end = automation.end_time
+            time_in_range = start <= now <= end
+
+            if time_in_range and not automation.is_running:
+                execute_automation(automation, activate=True)
+                automation.is_running = True
+                automation.last_triggered = timezone.now()
+                automation.save()
+
+            elif not time_in_range and automation.is_running:
+                execute_automation(automation, activate=False)
+                automation.is_running = False
+                automation.save()
+                
+        except Exception as e:
+            print(f"Error processing automation {automation.id}: {str(e)}")
+
+def start_scheduler():
+    scheduler = BackgroundScheduler()
+    scheduler.add_jobstore(DjangoJobStore(), 'default')
+    scheduler.add_job(
+        check_automations,
+        'interval',
+        minutes=1,
+        name='automation_check',
+        replace_existing=True
+    )
+    scheduler.start()
