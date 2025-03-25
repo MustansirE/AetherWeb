@@ -422,8 +422,13 @@ export function RoomsAndDevicesPage() {
 
       {/* Rooms Carousel */}
       {rooms.length === 0 ? (
+        
         <div className="text-center text-gray-400 py-12 glass-card rounded-xl">
-          No rooms available. Click "Add Room" to get started.
+          No rooms available. Click "Add Room" to get started <br />
+          <br />
+          Rooms are essentially containers for your devices  <br />
+          <br />
+          This ensures that all your devices are appropriately turned on based on which room you are in
         </div>
       ) : (
         <div className="relative">

@@ -78,7 +78,7 @@ def signup(request):
             
             # add an 'All' room
             # in 'All' add thermostat and Monitor devices 
-            room = Room.objects.create(name='All', house=house, room_id=get_random_string(8), room_number=1)
+            room = Room.objects.create(name='General', house=house, room_id=get_random_string(8), room_number=1)
             room.save()
             
             device_id = generate_unique_code()
@@ -138,6 +138,7 @@ def signup(request):
             MonitorVariableDevice.objects.create(device=tempsensor, state=0)
             
             refresh = RefreshToken.for_user(user)
+            
             return Response({
                 'access_token': str(refresh.access_token),
                 'user_id': user.id

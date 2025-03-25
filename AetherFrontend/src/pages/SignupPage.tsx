@@ -15,6 +15,7 @@ export function SignupPage() {
     confirmPassword: '',
     planType: 'home',
   });
+  const [checkedbox, setChecked] = useState<Boolean>(false);
   const [errorMessage, setErrorMessage] = useState('');
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [modalContent, setModalContent] = useState<'terms' | 'privacy'>('terms');
@@ -46,11 +47,11 @@ export function SignupPage() {
   also serves to remind you that you are able to request us to discard all data collected from your 
   account. 
 
-  **Data Collection:**  
+  Data Collection: 
   We collect many different types of data, for providing our features to our users and to comply 
   with legal requirements.  
 
-  **Types of Data collected:**  
+  Types of Data collected: 
   - Personal information (including Name, Email, Phone Number, and Payment Information)  
   - Device specifications  
   - Device network usage logs  
@@ -71,12 +72,17 @@ export function SignupPage() {
   Any external links in our applications follow their respective privacy policies. AETHER bears no responsibility for external privacy policies.  
 
   We will notify users of any changes to our terms and conditions or privacy policy.  
-  For any queries, contact **support@aether.ae**.  
+  For any queries, contact support@aether.ae.  
 `;
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setErrorMessage('');
+
+    if (!checkedbox) {
+      setErrorMessage('You must accept the terms and conditions to sign up.');
+      return;
+    }
 
     const payload = {
       first_name: formData.firstName,
@@ -95,10 +101,10 @@ export function SignupPage() {
 
       if (response.status === 201) {
         localStorage.setItem('access_token', response.data.access_token);
-        localStorage.setItem('refresh_token', response.data.refresh_token); 
+        localStorage.setItem('refresh_token', response.data.refresh_token);
         navigate('/tutorial');
       }
-    } catch (error:any) {
+    } catch (error: any) {
       const message = error.response?.data?.error || error.message;
       setErrorMessage(message || 'Signup failed. Please try again.');
       console.error('Signup error:', error.response?.data);
@@ -107,16 +113,19 @@ export function SignupPage() {
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
-    setFormData(prev => ({ 
-      ...prev, 
-      [name]: name === 'phone' ? value.replace(/\D/g, '').slice(0, 9) : value 
+    setFormData(prev => ({
+      ...prev,
+      [name]: name === 'phone' ? value.replace(/\D/g, '').slice(0, 9) : value
     }));
+  };
+  const handleCheckbox = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setChecked(e.target.checked);
   };
 
   return (
     <div className="h-full flex items-center justify-center p-4 bg-cover bg-center bg-no-repeat"
       style={{ backgroundImage: 'url("https://images.unsplash.com/photo-1558002038-1055907df827")' }}>
-      
+
       <div className="absolute inset-0 bg-black bg-opacity-40" />
 
       <button
@@ -262,7 +271,8 @@ export function SignupPage() {
 
             <button
               type="submit"
-              className="w-full py-3 bg-[#D9A279] text-white font-semibold rounded-xl hover:bg-[#b48862] transition-colors">
+              disabled={!checkedbox} // Changed from disabled={checkedbox}
+              className="w-full py-3 bg-[#D9A279] text-white font-semibold rounded-xl hover:bg-[#b48862] transition-colors disabled:opacity-50 disabled:cursor-not-allowed">
               Create Account
             </button>
           </form>
@@ -272,20 +282,22 @@ export function SignupPage() {
             <input
               id="accept-terms"
               type="checkbox"
+              onChange={handleCheckbox}
               className="h-4 w-4 rounded border-gray-600 bg-black/30 text-[#90AC95] focus:ring-[#90AC95]"
+              checked={!!checkedbox}
             />
             <label htmlFor="accept-terms" className="ml-2 block text-sm text-gray-200">
-              I accept 
-              <button 
-                type="button" 
-                onClick={() => { setIsModalOpen(true); setModalContent('terms'); }} 
+              I accept
+              <button
+                type="button"
+                onClick={() => { setIsModalOpen(true); setModalContent('terms'); }}
                 className="text-orange-400 underline ml-1">
                 Terms and Conditions
               </button>
               and
-              <button 
-                type="button" 
-                onClick={() => { setIsModalOpen(true); setModalContent('privacy'); }} 
+              <button
+                type="button"
+                onClick={() => { setIsModalOpen(true); setModalContent('privacy'); }}
                 className="text-orange-400 underline ml-1">
                 Privacy Policy
               </button>
@@ -313,7 +325,7 @@ export function SignupPage() {
                   <pre className="whitespace-pre-wrap">{modalContent === 'terms' ? termsAndConditions : privacyPolicy}</pre>
                 </div>
 
-                <button 
+                <button
                   onClick={() => setIsModalOpen(false)}
                   className="mt-4 px-4 py-2 bg-orange-500 text-white rounded-lg hover:bg-orange-600 transition">
                   Close

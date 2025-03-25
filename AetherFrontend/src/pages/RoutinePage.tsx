@@ -412,7 +412,7 @@ export function RoutinePage() {
                     {/* Toggle Power Button */}
                     <button
                       onClick={() => toggleDevicePower(device.id)}
-                      className={`px-4 py-2 rounded-lg ${device.isOn ? 'bg-green-500' : 'bg-red-500'
+                      className={`px-4 py-2 rounded-lg ${device.isOn ? 'bg-red-500' : 'bg-green-500'
                         } text-white`}
                     >
                       {device.isOn ? 'Turn Off' : 'Turn On'}

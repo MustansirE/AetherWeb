@@ -198,3 +198,4 @@ EMAIL_USE_TLS = True
 EMAIL_HOST_USER = 'janedoe@email.com'  
 EMAIL_HOST_PASSWORD = '1234567890' 
 DEFAULT_FROM_EMAIL = 'Aether janedoe@email.com'
+

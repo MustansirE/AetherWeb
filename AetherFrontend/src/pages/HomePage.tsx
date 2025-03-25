@@ -392,7 +392,7 @@ export function HomePage() {
                   className={`w-full mt-2 px-3 py-1 text-white rounded-lg transition-colors ${joinedEvents[event.id] ? "bg-gray-500 hover:bg-gray-400" : "bg-[#EAAC82] hover:bg-[#D8946F]"
                     }`}
                 >
-                  {joinedEvents[event.id] ? "Unjoin" : "Join"}
+                  {joinedEvents[event.id] ? "Leave" : "Join"}
                 </button>
               </div>
             ))}
