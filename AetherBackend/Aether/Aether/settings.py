@@ -191,12 +191,10 @@ SIMPLE_JWT = {
     'BLACKLIST_AFTER_ROTATION': True,  # Blacklist old tokens after rotation
 }
 
-# Add these settings to your settings.py file
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
-EMAIL_HOST = 'smtp.gmail.com'  # Or your email provider's SMTP server
+EMAIL_HOST = 'smtp.gmail.com'
 EMAIL_PORT = 587
 EMAIL_USE_TLS = True
-EMAIL_HOST_USER = 'janedoe@email.com'  
-EMAIL_HOST_PASSWORD = '1234567890' 
-DEFAULT_FROM_EMAIL = 'Aether janedoe@email.com'
+EMAIL_HOST_USER = 'meranpurwala@gmail.com'
+EMAIL_HOST_PASSWORD = 'mus05_Mte'
 
