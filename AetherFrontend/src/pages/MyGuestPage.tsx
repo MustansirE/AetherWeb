@@ -15,45 +15,7 @@ interface Guest {
   status: string;
 }
 
-// Fake Data (Hardcoded)
-const testGuests: Guest[] = [
-  {
-    id: "1",
-    full_name: "John Doe",
-    departure_date: "2025-03-20",
-    access_code: "XYZ123",
-    allowed_rooms: ["Living Room", "Kitchen"],
-    status: "active",
-  },
-  {
-    id: "2",
-    full_name: "Jane Smith",
-    departure_date: "2025-04-10",
-    access_code: "ABC456",
-    allowed_rooms: ["Master Bedroom"],
-    status: "pending",
-  },
-];
-
-const testRooms: Room[] = [
-  { id: "1", name: "Living Room" },
-  { id: "2", name: "Kitchen" },
-  { id: "3", name: "Master Bedroom" },
-];
-
-
-// Mock rooms data
-const rooms: Room[] = [
-  { id: '1', name: 'Living Room' },
-  { id: '2', name: 'Kitchen' },
-  { id: '3', name: 'Master Bedroom' },
-  { id: '4', name: 'Guest Bedroom' },
-  { id: '5', name: 'Bathroom' }
-]
-
 export function MyGuestPage() {
-  //const [showAddGuest, setShowAddGuest] = useState(false)
-  //const [guests, setGuests] = useState<Guest[]>([])
   const [newGuest, setNewGuest] = useState({
     name: '',
     departureDate: '',
@@ -64,12 +26,9 @@ export function MyGuestPage() {
     houseId: string;
   } | null>(null)
   const [copiedField, setCopiedField] = useState<'guestCode' | 'houseId' | null>(null)
-  // const [rooms, setRooms] = useState<Room[]>([])
   const [timer, setTimer] = useState<number>(300); // 5 minutes in seconds
   const [currentGuestId, setCurrentGuestId] = useState<string | null>(null);
-  // const [guests, setGuests] = useState<Guest[]>(testGuests);
   const [guests, setGuests] = useState<Guest[]>([]);
-  // const [rooms, setRooms] = useState<Room[]>(testRooms);
   const [rooms, setRooms] = useState<Room[]>([]);
   const [showAddGuest, setShowAddGuest] = useState(false);
 
@@ -102,7 +61,6 @@ export function MyGuestPage() {
     }
   }, [showAddGuest]);
 
-
   const handleRoomToggle = (roomId: string) => {
     setNewGuest(prev => ({
       ...prev,
@@ -111,8 +69,6 @@ export function MyGuestPage() {
         : [...prev.allowedRooms, roomId]
     }))
   }
-
-
 
   const generateRandomCode = (length: number) => {
     const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789'
@@ -166,7 +122,6 @@ export function MyGuestPage() {
     }
   };
 
-
   // Fetch verified guests from backend
   const fetchGuests = async () => {
     try {
@@ -207,10 +162,27 @@ export function MyGuestPage() {
     setShowAddGuest(false)
   }
 
-  const handleDeleteGuest = (guestId: string) => {
-    setGuests(prev => prev.filter(guest => guest.id !== guestId))
-  }
+  const handleDeleteGuest = async (guestId: string) => {
+    try {
+      const token = localStorage.getItem('access_token');
+      const response = await fetch('http://127.0.0.1:8000/delete_guest/', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ guest_id: guestId }),
+      });
 
+      if (response.ok) {
+        setGuests(prev => prev.filter(guest => guest.id !== guestId));
+      } else {
+        console.error("Failed to delete guest:", response.status);
+      }
+    } catch (error) {
+      console.error("Error deleting guest:", error);
+    }
+  }
 
   useEffect(() => {
     if (timer > 0 && currentGuestId) {
@@ -281,52 +253,17 @@ export function MyGuestPage() {
     }
   }, [currentGuestId]);
 
-  // Guests list rendering
-  const renderGuestsList = () => {
-    if (guests.length === 0) {
-      return (
-        <div className="text-center text-gray-400 py-12">
-          No active guests found
-        </div>
-      )
-    }
-
-    return guests.map(guest => (
-      <div key={guest.id} className="glass-card p-6 rounded-xl">
-        <div className="flex justify-between items-center mb-4">
-          <div>
-            <h3 className="text-lg font-medium text-white">{guest.full_name}</h3>
-            <p className="text-sm text-gray-400">
-              Departure: {new Date(guest.departure_date).toLocaleDateString()}
-            </p>
-            <p className="text-sm text-gray-400">Code: {guest.access_code}</p>
-          </div>
-          <button
-            className="text-gray-400 hover:text-red-500 p-2 rounded-lg"
-            onClick={() => handleDeleteGuest(guest.id)}
-          >
-            <Trash2 className="w-5 h-5" />
-          </button>
-
-        </div>
-
-        <div className="flex items-center gap-2 text-sm">
-          <DoorOpen className="w-4 h-4 text-[#EAAC82]" />
-          <span className="text-gray-400">
-            {guest.allowed_rooms.length} {guest.allowed_rooms.length === 1 ? 'room' : 'rooms'} allowed
-          </span>
-        </div>
-      </div>
-    ))
-  }
-
   return (
     <div className="space-y-6 animate-fade-in">
       <div className="flex justify-between items-center">
-        <h1 className="text-2xl font-semibold text-white">My Guests</h1>
+        <h1 className="text-2xl font-semibold" style={{ color: 'var(--text-primary)' }}>My Guests</h1>
         <button
           onClick={() => setShowAddGuest(true)}
-          className="bg-[#8DA08E] hover:bg-[#7A9580] text-white px-4 py-2 rounded-lg flex items-center gap-2 transition-colors hover-pulse"
+          className="flex items-center gap-2 px-4 py-2 rounded-lg transition-colors hover-pulse"
+          style={{ 
+            backgroundColor: 'var(--secondary-accent)', 
+            color: 'white'
+          }}
         >
           <Plus className="w-5 h-5" />
           Add Guest
@@ -335,12 +272,13 @@ export function MyGuestPage() {
 
       {/* Add Guest Form */}
       {showAddGuest && (
-        <div className="glass-card p-6 rounded-xl animate-slide-up">
+        <div className="glass-card p-6 rounded-xl animate-slide-up" style={{ backgroundColor: 'var(--bg-secondary)' }}>
           <div className="flex justify-between items-center mb-6">
-            <h2 className="text-lg font-semibold text-white">Add New Guest</h2>
+            <h2 className="text-lg font-semibold" style={{ color: 'var(--text-primary)' }}>Add New Guest</h2>
             <button
               onClick={resetForm}
-              className="text-gray-400 hover:text-gray-300"
+              style={{ color: 'var(--text-muted)' }}
+              className="hover:text-gray-300"
             >
               <X className="w-5 h-5" />
             </button>
@@ -350,7 +288,7 @@ export function MyGuestPage() {
             <div className="space-y-4">
               {/* Guest Name */}
               <div>
-                <label className="block text-sm font-medium text-gray-200 mb-2">
+                <label className="block text-sm font-medium mb-2" style={{ color: 'var(--text-secondary)' }}>
                   Guest Name
                 </label>
                 <input
@@ -358,13 +296,18 @@ export function MyGuestPage() {
                   value={newGuest.name}
                   onChange={(e) => setNewGuest(prev => ({ ...prev, name: e.target.value }))}
                   placeholder="Enter guest name"
-                  className="w-full bg-[#262626] text-white border border-gray-600 rounded-lg px-4 py-2 focus:outline-none focus:border-[#EAAC82]"
+                  className="w-full border rounded-lg px-4 py-2 focus:outline-none"
+                  style={{ 
+                    backgroundColor: 'var(--input-bg)', 
+                    color: 'var(--text-primary)', 
+                    borderColor: 'var(--border-color)'
+                  }}
                 />
               </div>
 
               {/* Departure Date */}
               <div>
-                <label className="block text-sm font-medium text-gray-200 mb-2">
+                <label className="block text-sm font-medium mb-2" style={{ color: 'var(--text-secondary)' }}>
                   Departure Date
                 </label>
                 <div className="relative">
@@ -376,29 +319,39 @@ export function MyGuestPage() {
                     value={newGuest.departureDate}
                     onChange={(e) => setNewGuest(prev => ({ ...prev, departureDate: e.target.value }))}
                     min={new Date().toISOString().split('T')[0]}
-                    className="w-full bg-[#262626] text-white border border-gray-600 rounded-lg pl-10 pr-4 py-2 focus:outline-none focus:border-[#EAAC82]"
+                    className="w-full border rounded-lg pl-10 pr-4 py-2 focus:outline-none"
+                    style={{ 
+                      backgroundColor: 'var(--input-bg)', 
+                      color: 'var(--text-primary)', 
+                      borderColor: 'var(--border-color)'
+                    }}
                   />
                 </div>
               </div>
 
               {/* Room Access */}
               <div>
-                <label className="block text-sm font-medium text-gray-200 mb-2">
+                <label className="block text-sm font-medium mb-2" style={{ color: 'var(--text-secondary)' }}>
                   Room Access
                 </label>
                 <div className="grid grid-cols-2 gap-3">
                   {rooms.map(room => (
                     <label
                       key={room.id}
-                      className="flex items-center space-x-3 p-3 rounded-lg bg-[#262626] cursor-pointer hover:bg-[#333333] transition-colors"
+                      className="flex items-center space-x-3 p-3 rounded-lg cursor-pointer transition-colors"
+                      style={{ 
+                        backgroundColor: 'var(--input-bg)', 
+                        color: 'var(--text-primary)'
+                      }}
                     >
                       <input
                         type="checkbox"
                         checked={newGuest.allowedRooms.includes(room.id)}
                         onChange={() => handleRoomToggle(room.id)}
-                        className="form-checkbox h-5 w-5 text-[#EAAC82] rounded border-gray-600 bg-transparent focus:ring-[#EAAC82]"
+                        className="form-checkbox h-5 w-5 rounded border-gray-600 bg-transparent focus:ring-[#EAAC82]"
+                        style={{ color: 'var(--accent-color)' }}
                       />
-                      <span className="text-white">{room.name}</span>
+                      <span style={{ color: 'var(--text-primary)' }}>{room.name}</span>
                     </label>
                   ))}
                 </div>
@@ -407,7 +360,8 @@ export function MyGuestPage() {
               <button
                 onClick={handleGenerateCode}
                 disabled={!newGuest.name || !newGuest.departureDate || newGuest.allowedRooms.length === 0}
-                className="w-full bg-[#EAAC82] hover:bg-[#D9A279] text-white py-3 rounded-lg flex items-center justify-center gap-2 transition-colors disabled:opacity-50 disabled:cursor-not-allowed mt-4"
+                className="w-full py-3 rounded-lg flex items-center justify-center gap-2 transition-colors disabled:opacity-50 disabled:cursor-not-allowed mt-4"
+                style={{ backgroundColor: 'var(--accent-color)', color: 'white' }}
               >
                 <Key className="w-5 h-5" />
                 Generate Guest Code
@@ -416,24 +370,26 @@ export function MyGuestPage() {
           ) : (
             <div className="space-y-6">
               <div className="text-center">
-                <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-[#EAAC82]/20 text-[#EAAC82] mb-4">
+                <div className="inline-flex items-center justify-center w-16 h-16 rounded-full mb-4" 
+                  style={{ backgroundColor: 'var(--accent-color)', opacity: 0.2, color: 'var(--accent-color)' }}>
                   <Key className="w-8 h-8" />
                 </div>
-                <h3 className="text-lg font-medium text-white mb-2">
+                <h3 className="text-lg font-medium mb-2" style={{ color: 'var(--text-primary)' }}>
                   Guest Access Codes Generated
                 </h3>
-                <p className="text-sm text-gray-400">
+                <p className="text-sm" style={{ color: 'var(--text-muted)' }}>
                   Share these codes with your guest to grant them access
                 </p>
               </div>
 
               <div className="space-y-4">
-                <div className="bg-[#262626] p-4 rounded-lg">
+                <div className="p-4 rounded-lg" style={{ backgroundColor: 'var(--input-bg)' }}>
                   <div className="flex justify-between items-center mb-2">
-                    <span className="text-sm text-gray-400">Guest Code</span>
+                    <span className="text-sm" style={{ color: 'var(--text-muted)' }}>Guest Code</span>
                     <button
                       onClick={() => handleCopyCode(generatedCodes.guestCode, 'guestCode')}
-                      className="text-[#EAAC82] hover:text-[#D9A279] p-2 rounded-lg transition-colors"
+                      className="p-2 rounded-lg transition-colors"
+                      style={{ color: 'var(--accent-color)' }}
                     >
                       {copiedField === 'guestCode' ? (
                         <Check className="w-5 h-5" />
@@ -442,17 +398,18 @@ export function MyGuestPage() {
                       )}
                     </button>
                   </div>
-                  <div className="text-xl font-mono text-white tracking-wider">
+                  <div className="text-xl font-mono tracking-wider" style={{ color: 'var(--text-primary)' }}>
                     {generatedCodes.guestCode}
                   </div>
                 </div>
 
-                <div className="bg-[#262626] p-4 rounded-lg">
+                <div className="p-4 rounded-lg" style={{ backgroundColor: 'var(--input-bg)' }}>
                   <div className="flex justify-between items-center mb-2">
-                    <span className="text-sm text-gray-400">House ID</span>
+                    <span className="text-sm" style={{ color: 'var(--text-muted)' }}>House ID</span>
                     <button
                       onClick={() => handleCopyCode(generatedCodes.houseId, 'houseId')}
-                      className="text-[#EAAC82] hover:text-[#D9A279] p-2 rounded-lg transition-colors"
+                      className="p-2 rounded-lg transition-colors"
+                      style={{ color: 'var(--accent-color)' }}
                     >
                       {copiedField === 'houseId' ? (
                         <Check className="w-5 h-5" />
@@ -461,7 +418,7 @@ export function MyGuestPage() {
                       )}
                     </button>
                   </div>
-                  <div className="text-xl font-mono text-white tracking-wider">
+                  <div className="text-xl font-mono tracking-wider" style={{ color: 'var(--text-primary)' }}>
                     {generatedCodes.houseId}
                   </div>
                 </div>
@@ -469,7 +426,8 @@ export function MyGuestPage() {
 
               <button
                 onClick={resetForm}
-                className="w-full bg-[#90AC95] hover:bg-[#7A9580] text-white py-3 rounded-lg transition-colors"
+                className="w-full py-3 rounded-lg transition-colors"
+                style={{ backgroundColor: 'var(--secondary-accent)', color: 'white' }}
               >
                 Done
               </button>
@@ -478,64 +436,62 @@ export function MyGuestPage() {
         </div>
       )}
 
-
-
       {/* Guests List */}
       <div className="grid gap-4">
         {guests.length > 0 ? (
           guests.map((guest) => (
-            <div key={guest.id} className="glass-card p-6 rounded-xl">
+            <div key={guest.id} className="glass-card p-6 rounded-xl" style={{ backgroundColor: 'var(--bg-secondary)' }}>
               <div className="flex justify-between items-center mb-4">
                 <div>
-                  <h3 className="text-lg font-medium text-white">{guest.full_name}</h3>
-                  <p className="text-sm text-gray-400">
+                  <h3 className="text-lg font-medium" style={{ color: 'var(--text-primary)' }}>{guest.full_name}</h3>
+                  <p className="text-sm" style={{ color: 'var(--text-muted)' }}>
                     Departure: {new Date(guest.departure_date).toLocaleDateString()}
                   </p>
-                  <p className="text-sm text-gray-400">Code: {guest.access_code}</p>
+                  <p className="text-sm" style={{ color: 'var(--text-muted)' }}>Code: {guest.access_code}</p>
                 </div>
                 <button
-                  className="text-gray-400 hover:text-red-500 p-2 rounded-lg"
-                  onClick={() => setGuests(guests.filter((g) => g.id !== guest.id))}
+                  className="p-2 rounded-lg transition-colors"
+                  style={{ color: 'var(--text-muted)' }}
+                  onClick={() => handleDeleteGuest(guest.id)}
                 >
-                  <Trash2 className="w-5 h-5" />
+                  <Trash2 className="w-5 h-5" style={{ color: 'var(--danger-text)' }} />
                 </button>
               </div>
 
               <div className="flex items-center gap-2 text-sm">
-                <DoorOpen className="w-4 h-4 text-[#EAAC82]" />
-                <span className="text-gray-400">
+                <DoorOpen className="w-4 h-4" style={{ color: 'var(--accent-color)' }} />
+                <span style={{ color: 'var(--text-muted)' }}>
                   {guest.allowed_rooms.length} {guest.allowed_rooms.length === 1 ? "room" : "rooms"} allowed
                 </span>
               </div>
             </div>
           ))
         ) : (
-          <div className="text-center text-gray-400 py-12"> </div>
+          <div className="text-center py-12" style={{ color: 'var(--text-muted)' }}> </div>
         )}
-
-
 
         {/* Modal for Generated Code */}
         {generatedCodes && (
           <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-            <div className="bg-[#262626] p-6 rounded-lg w-full max-w-md">
+            <div className="p-6 rounded-lg w-full max-w-md" style={{ backgroundColor: 'var(--bg-secondary)' }}>
               <div className="text-center">
-                <h3 className="text-lg font-medium text-white mb-4">
+                <h3 className="text-lg font-medium mb-4" style={{ color: 'var(--text-primary)' }}>
                   Guest Code Generated
                 </h3>
-                <div className="text-sm text-gray-400 mb-6">
+                <div className="text-sm mb-6" style={{ color: 'var(--text-muted)' }}>
                   Share these codes with your guest. The code will expire in:
                 </div>
-                <div className="text-2xl font-mono text-[#EAAC82] mb-6">
+                <div className="text-2xl font-mono mb-6" style={{ color: 'var(--accent-color)' }}>
                   {Math.floor(timer / 60)}:{String(timer % 60).padStart(2, '0')}
                 </div>
                 <div className="space-y-4">
-                  <div className="bg-[#333333] p-4 rounded-lg">
+                  <div className="p-4 rounded-lg" style={{ backgroundColor: 'var(--input-bg)' }}>
                     <div className="flex justify-between items-center mb-2">
-                      <span className="text-sm text-gray-400">Guest Code</span>
+                      <span className="text-sm" style={{ color: 'var(--text-muted)' }}>Guest Code</span>
                       <button
                         onClick={() => handleCopyCode(generatedCodes.guestCode, 'guestCode')}
-                        className="text-[#EAAC82] hover:text-[#D9A279] p-2 rounded-lg transition-colors"
+                        className="p-2 rounded-lg transition-colors"
+                        style={{ color: 'var(--accent-color)' }}
                       >
                         {copiedField === 'guestCode' ? (
                           <Check className="w-5 h-5" />
@@ -544,16 +500,17 @@ export function MyGuestPage() {
                         )}
                       </button>
                     </div>
-                    <div className="text-xl font-mono text-white tracking-wider">
+                    <div className="text-xl font-mono tracking-wider" style={{ color: 'var(--text-primary)' }}>
                       {generatedCodes.guestCode}
                     </div>
                   </div>
-                  <div className="bg-[#333333] p-4 rounded-lg">
+                  <div className="p-4 rounded-lg" style={{ backgroundColor: 'var(--input-bg)' }}>
                     <div className="flex justify-between items-center mb-2">
-                      <span className="text-sm text-gray-400">House ID</span>
+                      <span className="text-sm" style={{ color: 'var(--text-muted)' }}>House ID</span>
                       <button
                         onClick={() => handleCopyCode(generatedCodes.houseId, 'houseId')}
-                        className="text-[#EAAC82] hover:text-[#D9A279] p-2 rounded-lg transition-colors"
+                        className="p-2 rounded-lg transition-colors"
+                        style={{ color: 'var(--accent-color)' }}
                       >
                         {copiedField === 'houseId' ? (
                           <Check className="w-5 h-5" />
@@ -562,7 +519,7 @@ export function MyGuestPage() {
                         )}
                       </button>
                     </div>
-                    <div className="text-xl font-mono text-white tracking-wider">
+                    <div className="text-xl font-mono tracking-wider" style={{ color: 'var(--text-primary)' }}>
                       {generatedCodes.houseId}
                     </div>
                   </div>
@@ -573,7 +530,8 @@ export function MyGuestPage() {
                     setCurrentGuestId(null);
                     handleDeleteUnverifiedGuest();
                   }}
-                  className="w-full bg-[#90AC95] hover:bg-[#7A9580] text-white py-3 rounded-lg transition-colors mt-6"
+                  className="w-full py-3 rounded-lg transition-colors mt-6"
+                  style={{ backgroundColor: 'var(--secondary-accent)', color: 'white' }}
                 >
                   Close
                 </button>
@@ -581,16 +539,13 @@ export function MyGuestPage() {
             </div>
           </div>
         )}
-
       </div>
 
-      {
-        guests.length === 0 && !showAddGuest && (
-          <div className="text-center text-gray-400 py-12">
-            No guests added yet. Click "Add Guest" to get started.
-          </div>
-        )
-      }
-    </div >
+      {guests.length === 0 && !showAddGuest && (
+        <div className="text-center py-12" style={{ color: 'var(--text-muted)' }}>
+          No guests added yet. Click "Add Guest" to get started.
+        </div>
+      )}
+    </div>
   )
 }

@@ -333,13 +333,13 @@ export function DeviceSharingPage() {
 
   return (
     <div className="space-y-8 animate-fade-in">
-      <h1 className="text-2xl font-semibold text-white">Device Sharing</h1>
+      <h1 className="text-2xl font-semibold" style={{ color: 'var(--text-primary)' }}>Device Sharing</h1>
 
       {/* Device Search Section */}
-      <section className="glass-card rounded-xl p-6">
+      <section className="glass-card rounded-xl p-6" style={{ backgroundColor: 'var(--bg-secondary)' }}>
         <div className="flex items-center gap-2 mb-6">
-          <Search className="w-5 h-5 text-[#EAAC82]" />
-          <h2 className="text-lg font-semibold text-white">Find Device</h2>
+          <Search className="w-5 h-5" style={{ color: 'var(--accent-color)' }} />
+          <h2 className="text-lg font-semibold" style={{ color: 'var(--text-primary)' }}>Find Device</h2>
         </div>
         <form onSubmit={handleSearch} className="flex gap-4">
           <input
@@ -347,11 +347,21 @@ export function DeviceSharingPage() {
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             placeholder="Enter device product code"
-            className="flex-1 bg-[#262626] text-white border border-gray-600 rounded-lg px-4 py-2 focus:outline-none focus:border-[#EAAC82]"
+            className="flex-1 rounded-lg px-4 py-2 focus:outline-none"
+            style={{ 
+              backgroundColor: 'var(--input-bg)', 
+              color: 'var(--text-primary)', 
+              borderColor: 'var(--border-color)',
+              border: '1px solid'
+            }}
           />
           <button
             type="submit"
-            className="bg-[#EAAC82] hover:bg-[#D9A279] text-white px-6 py-2 rounded-lg transition-colors"
+            className="px-6 py-2 rounded-lg transition-colors"
+            style={{ 
+              backgroundColor: 'var(--accent-color)', 
+              color: 'white' 
+            }}
           >
             Search
           </button>
@@ -360,23 +370,27 @@ export function DeviceSharingPage() {
 
       {/* Search Results Section */}
       {searchResults.length > 0 && (
-        <section className="glass-card rounded-xl p-6">
+        <section className="glass-card rounded-xl p-6" style={{ backgroundColor: 'var(--bg-secondary)' }}>
           <div className="flex items-center gap-2 mb-6">
-            <Search className="w-5 h-5 text-[#EAAC82]" />
-            <h2 className="text-lg font-semibold text-white">Search Results</h2>
+            <Search className="w-5 h-5" style={{ color: 'var(--accent-color)' }} />
+            <h2 className="text-lg font-semibold" style={{ color: 'var(--text-primary)' }}>Search Results</h2>
           </div>
           <div className="grid gap-4">
             {searchResults.map(result => (
-              <div key={result.id} className="bg-[#262626] p-4 rounded-lg flex items-center justify-between">
+              <div key={result.id} className="p-4 rounded-lg flex items-center justify-between" style={{ backgroundColor: 'var(--bg-tertiary)' }}>
                 <div>
-                  <h3 className="text-white font-medium">{result.deviceName}</h3>
-                  <p className="text-sm text-gray-400">Condition: {result.condition}</p>
-                  <p className="text-sm text-gray-400">Owner: {result.ownerName}</p>
+                  <h3 className="font-medium" style={{ color: 'var(--text-primary)' }}>{result.deviceName}</h3>
+                  <p className="text-sm" style={{ color: 'var(--text-muted)' }}>Condition: {result.condition}</p>
+                  <p className="text-sm" style={{ color: 'var(--text-muted)' }}>Owner: {result.ownerName}</p>
                 </div>
                 <div className="flex items-center gap-4">
                   <button
                     onClick={() => handleCreateRequest(result.id)}
-                    className="bg-[#EAAC82] hover:bg-[#D9A279] text-white px-4 py-2 rounded-lg transition-colors"
+                    className="px-4 py-2 rounded-lg transition-colors"
+                    style={{ 
+                      backgroundColor: 'var(--accent-color)', 
+                      color: 'white' 
+                    }}
                   >
                     Request
                   </button>
@@ -388,15 +402,19 @@ export function DeviceSharingPage() {
       )}
 
       {/* My Listings Section */}
-      <section className="glass-card rounded-xl p-6">
+      <section className="glass-card rounded-xl p-6" style={{ backgroundColor: 'var(--bg-secondary)' }}>
         <div className="flex justify-between items-center mb-6">
           <div className="flex items-center gap-2">
-            <ListPlus className="w-5 h-5 text-[#EAAC82]" />
-            <h2 className="text-lg font-semibold text-white">My Listings</h2>
+            <ListPlus className="w-5 h-5" style={{ color: 'var(--accent-color)' }} />
+            <h2 className="text-lg font-semibold" style={{ color: 'var(--text-primary)' }}>My Listings</h2>
           </div>
           <button
             onClick={() => setShowAddListing(true)}
-            className="bg-[#90AC95] hover:bg-[#7A9580] text-white px-4 py-2 rounded-lg flex items-center gap-2 transition-colors"
+            className="px-4 py-2 rounded-lg flex items-center gap-2 transition-colors"
+            style={{ 
+              backgroundColor: 'var(--secondary-accent)', 
+              color: 'white' 
+            }}
           >
             <Plus className="w-5 h-5" />
             Add Listing
@@ -405,14 +423,20 @@ export function DeviceSharingPage() {
 
         {/* Add Listing Form */}
         {showAddListing && (
-          <div className="bg-[#262626] p-4 rounded-lg mb-6 animate-slide-up">
+          <div className="p-4 rounded-lg mb-6 animate-slide-up" style={{ backgroundColor: 'var(--bg-tertiary)' }}>
             <div className="space-y-4">
               <div>
-                <label className="block text-sm text-gray-300 mb-2">Select Device</label>
+                <label className="block text-sm mb-2" style={{ color: 'var(--text-secondary)' }}>Select Device</label>
                 <select
                   value={selectedDevice}
                   onChange={(e) => setSelectedDevice(e.target.value)}
-                  className="w-full bg-[#333333] text-white border border-gray-600 rounded-lg px-4 py-2 focus:outline-none focus:border-[#EAAC82]"
+                  className="w-full rounded-lg px-4 py-2 focus:outline-none"
+                  style={{ 
+                    backgroundColor: 'var(--input-bg)', 
+                    color: 'var(--text-primary)', 
+                    borderColor: 'var(--border-color)',
+                    border: '1px solid'
+                  }}
                 >
                   <option value="">Choose a device</option>
                   {userDevices.map(device => (
@@ -423,11 +447,17 @@ export function DeviceSharingPage() {
                 </select>
               </div>
               <div>
-                <label className="block text-sm text-gray-300 mb-2">Device Condition</label>
+                <label className="block text-sm mb-2" style={{ color: 'var(--text-secondary)' }}>Device Condition</label>
                 <select
                   value={selectedCondition}
                   onChange={(e) => setSelectedCondition(e.target.value as DeviceListing['condition'])}
-                  className="w-full bg-[#333333] text-white border border-gray-600 rounded-lg px-4 py-2 focus:outline-none focus:border-[#EAAC82]"
+                  className="w-full rounded-lg px-4 py-2 focus:outline-none"
+                  style={{ 
+                    backgroundColor: 'var(--input-bg)', 
+                    color: 'var(--text-primary)', 
+                    borderColor: 'var(--border-color)',
+                    border: '1px solid'
+                  }}
                 >
                   <option value="new">New</option>
                   <option value="average">Average</option>
@@ -437,13 +467,21 @@ export function DeviceSharingPage() {
               <div className="flex gap-3">
                 <button
                   onClick={handleAddListing}
-                  className="flex-1 bg-[#EAAC82] hover:bg-[#D9A279] text-white py-2 rounded-lg transition-colors"
+                  className="flex-1 py-2 rounded-lg transition-colors"
+                  style={{ 
+                    backgroundColor: 'var(--accent-color)', 
+                    color: 'white' 
+                  }}
                 >
                   Add Listing
                 </button>
                 <button
                   onClick={() => setShowAddListing(false)}
-                  className="flex-1 bg-gray-600 hover:bg-gray-700 text-white py-2 rounded-lg transition-colors"
+                  className="flex-1 py-2 rounded-lg transition-colors"
+                  style={{ 
+                    backgroundColor: 'var(--bg-secondary)', 
+                    color: 'var(--text-primary)'
+                  }}
                 >
                   Cancel
                 </button>
@@ -455,15 +493,16 @@ export function DeviceSharingPage() {
         {/* Listings Grid */}
         <div className="grid gap-4">
           {listings.map(listing => (
-            <div key={listing.id} className="bg-[#262626] p-4 rounded-lg flex items-center justify-between">
+            <div key={listing.id} className="p-4 rounded-lg flex items-center justify-between" style={{ backgroundColor: 'var(--bg-tertiary)' }}>
               <div>
-                <h3 className="text-white font-medium">{listing.deviceName}</h3>
-                <p className="text-sm text-gray-400">Condition: {listing.condition}</p>
+                <h3 className="font-medium" style={{ color: 'var(--text-primary)' }}>{listing.deviceName}</h3>
+                <p className="text-sm" style={{ color: 'var(--text-muted)' }}>Condition: {listing.condition}</p>
               </div>
               <div className="flex items-center gap-4">
                 <button
                   onClick={() => handleDeleteListing(listing.id)}
-                  className="text-gray-400 hover:text-red-500 p-2 rounded-lg transition-colors"
+                  className="p-2 rounded-lg transition-colors"
+                  style={{ color: 'var(--danger-text)' }}
                 >
                   <Trash2 className="w-5 h-5" />
                 </button>
@@ -472,7 +511,7 @@ export function DeviceSharingPage() {
           ))}
 
           {listings.length === 0 && (
-            <div className="text-center text-gray-400 py-8">
+            <div className="text-center py-8" style={{ color: 'var(--text-muted)' }}>
               No listings yet. Add your first device listing!
             </div>
           )}
@@ -480,38 +519,46 @@ export function DeviceSharingPage() {
       </section>
 
       {/* Requests Section */}
-      <section className="glass-card rounded-xl p-6">
+      <section className="glass-card rounded-xl p-6" style={{ backgroundColor: 'var(--bg-secondary)' }}>
         <div className="flex items-center gap-2 mb-6">
-          <Clock className="w-5 h-5 text-[#EAAC82]" />
-          <h2 className="text-lg font-semibold text-white">Requests</h2>
+          <Clock className="w-5 h-5" style={{ color: 'var(--accent-color)' }} />
+          <h2 className="text-lg font-semibold" style={{ color: 'var(--text-primary)' }}>Requests</h2>
         </div>
 
         <div className="space-y-6">
           {/* Pending Requests */}
           <div>
-            <h3 className="text-white font-medium mb-4">Pending Requests</h3>
+            <h3 className="font-medium mb-4" style={{ color: 'var(--text-primary)' }}>Pending Requests</h3>
             <div className="space-y-4">
               {lendRequests
                 .filter(request => request.status === 'pending')
                 .map(request => (
-                  <div key={request.id} className="bg-[#262626] p-4 rounded-lg">
+                  <div key={request.id} className="p-4 rounded-lg" style={{ backgroundColor: 'var(--bg-tertiary)' }}>
                     <div className="flex justify-between items-start mb-3">
                       <div>
-                        <h4 className="text-white font-medium">{request.deviceName}</h4>
-                        <p className="text-sm text-gray-400">
+                        <h4 className="font-medium" style={{ color: 'var(--text-primary)' }}>{request.deviceName}</h4>
+                        <p className="text-sm" style={{ color: 'var(--text-muted)' }}>
                           Requested by: {request.requesterName}
                         </p>
                       </div>
                       <div className="flex gap-2">
                         <button
                           onClick={() => handleRequestAction(request.id, 'accept')}
-                          className="p-2 bg-[#90AC95]/20 text-[#90AC95] rounded-lg hover:bg-[#90AC95]/30 transition-colors"
+                          className="p-2 rounded-lg hover:opacity-80 transition-opacity"
+                          style={{ 
+                            backgroundColor: 'rgba(144, 172, 149, 0.2)', 
+                            color: 'var(--secondary-accent)' 
+                          }}
                         >
                           <Check className="w-5 h-5" />
                         </button>
                         <button
                           onClick={() => handleRequestAction(request.id, 'reject')}
-                          className="p-2 bg-red-500/20 text-red-500 rounded-lg hover:bg-red-500/30 transition-colors"
+                          className="p-2 rounded-lg hover:opacity-80 transition-opacity"
+                          style={{ 
+                            backgroundColor: 'var(--danger-bg)', 
+                            color: 'var(--danger-text)' 
+                          }}
                         >
                           <X className="w-5 h-5" />
                         </button>
@@ -521,7 +568,7 @@ export function DeviceSharingPage() {
                 ))}
 
               {lendRequests.filter(request => request.status === 'pending').length === 0 && (
-                <div className="text-center text-gray-400 py-4">
+                <div className="text-center py-4" style={{ color: 'var(--text-muted)' }}>
                   No pending requests
                 </div>
               )}
@@ -530,24 +577,23 @@ export function DeviceSharingPage() {
 
           {/* Active Lends */}
           <div>
-            <h3 className="text-white font-medium mb-4">Active Lends</h3>
+            <h3 className="font-medium mb-4" style={{ color: 'var(--text-primary)' }}>Active Lends</h3>
             <div className="space-y-4">
               {lendRequests
                 .filter(request => request.status === 'active')
                 .map(request => (
-                  <div key={request.id} className="bg-[#262626] p-4 rounded-lg">
+                  <div key={request.id} className="p-4 rounded-lg" style={{ backgroundColor: 'var(--bg-tertiary)' }}>
                     <div className="flex justify-between items-start">
                       <div>
-                        <h4 className="text-white font-medium">{request.deviceName}</h4>
-                        <p className="text-sm text-gray-400">
+                        <h4 className="font-medium" style={{ color: 'var(--text-primary)' }}>{request.deviceName}</h4>
+                        <p className="text-sm" style={{ color: 'var(--text-muted)' }}>
                           Lent to: {request.requesterName}
                         </p>
                       </div>
                       <div className="flex items-center gap-4">
-
                         <div className="flex items-center gap-2">
-                          <Share2 className="w-5 h-5 text-[#EAAC82]" />
-                          <span className="text-[#EAAC82]">Active</span>
+                          <Share2 className="w-5 h-5" style={{ color: 'var(--accent-color)' }} />
+                          <span style={{ color: 'var(--accent-color)' }}>Active</span>
                         </div>
                       </div>
                     </div>
@@ -555,7 +601,7 @@ export function DeviceSharingPage() {
                 ))}
 
               {lendRequests.filter(request => request.status === 'active').length === 0 && (
-                <div className="text-center text-gray-400 py-4">
+                <div className="text-center py-4" style={{ color: 'var(--text-muted)' }}>
                   No active lends
                 </div>
               )}

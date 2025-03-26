@@ -16,9 +16,11 @@ import { SettingsPage } from './pages/SettingsPage'
 import { DeviceInfoPage } from './pages/DeviceInfoPage'
 import { GuestHomePage } from './pages/GuestHomePage'
 import { TutorialPage } from './pages/Tutorial'
+import { ThemeProvider } from './pages/ThemeContext.tsx';
 
 function App() {
   return (
+    <ThemeProvider>
     <BrowserRouter>
       <Routes>
         <Route path="/" element={<LandingPage />} />
@@ -42,6 +44,7 @@ function App() {
         </Route>
       </Routes>
     </BrowserRouter>
+    </ThemeProvider>
   )
 }
 

@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react'
-import { Plus, Trash2, Edit2, Save, X, Info, Power, ChevronLeft, ChevronRight } from 'lucide-react'
+import { Plus, Trash2, Edit2, Save, X, Info, Power, ChevronLeft, ChevronRight, Search } from 'lucide-react'
 import { useNavigate } from 'react-router-dom'
 
 interface Device {
@@ -33,6 +33,37 @@ export function RoomsAndDevicesPage() {
   })
   const [editingRoom, setEditingRoom] = useState<string | null>(null)
   const [editRoomName, setEditRoomName] = useState('')
+  const [searchQuery, setSearchQuery] = useState('');
+  const [filteredRooms, setFilteredRooms] = useState<Room[]>([]);
+
+  useEffect(() => {
+    if (!searchQuery.trim()) {
+      // If search query is empty, show all rooms
+      setFilteredRooms(rooms);
+    } else {
+      const lowercaseQuery = searchQuery.toLowerCase();
+      
+      // Filter rooms where either the room name or any of its devices match the query
+      const filtered = rooms.filter(room => 
+        room.name.toLowerCase().includes(lowercaseQuery) ||
+        room.devices.some(device => 
+          device.name.toLowerCase().includes(lowercaseQuery) ||
+          device.general_product_code.toLowerCase().includes(lowercaseQuery)
+        )
+      );
+      
+      setFilteredRooms(filtered);
+      
+      // If we have filtered results, show the first matching room
+      if (filtered.length > 0) {
+        // Find the index of the first matching room in the original rooms array
+        const firstMatchIndex = rooms.findIndex(r => r.room_id === filtered[0].room_id);
+        if (firstMatchIndex !== -1) {
+          setCurrentRoomIndex(firstMatchIndex);
+        }
+      }
+    }
+  }, [rooms, searchQuery]);
 
   const fetchRoomsAndDevices = async () => {
     try {
@@ -336,8 +367,6 @@ export function RoomsAndDevicesPage() {
     }));
   };
 
-
-
   const formatOptions = (options: string | string[]) => {
     if (Array.isArray(options)) {
       // If options is an array, clean up each string in the array
@@ -376,43 +405,76 @@ export function RoomsAndDevicesPage() {
     setCurrentRoomIndex(index);
   };
 
-
-
-
   return (
     <div className="space-y-6 animate-fade-in">
       <div className="flex justify-between items-center">
-        <h1 className="text-2xl font-semibold text-white">Rooms & Devices</h1>
+        <h1 className="text-2xl font-semibold" style={{ color: 'var(--text-primary)' }}>Rooms & Devices</h1>
         <button
           onClick={() => setShowAddRoom(true)}
-          className="bg-[#8DA08E] hover:bg-[#7A9580] text-white px-4 py-2 rounded-lg flex items-center gap-2 transition-colors hover-pulse"
+          className="px-4 py-2 rounded-lg flex items-center gap-2 transition-colors hover-pulse"
+          style={{ backgroundColor: 'var(--secondary-accent)', color: 'var(--text-on-accent)' }}
         >
           <Plus className="w-5 h-5" />
           Add Room
         </button>
       </div>
 
+      {/* Search Bar */}
+    <div className="relative">
+      <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+        <Search className="w-5 h-5" style={{ color: 'var(--text-muted)' }} />
+      </div>
+      <input
+        type="text"
+        value={searchQuery}
+        onChange={(e) => setSearchQuery(e.target.value)}
+        className="w-full pl-10 pr-4 py-2 rounded-lg focus:outline-none"
+        style={{ 
+          backgroundColor: 'var(--input-bg)', 
+          color: 'var(--text-primary)',
+          border: '1px solid var(--border-color)' 
+        }}
+        placeholder="Search rooms or devices..."
+      />
+      {searchQuery && (
+        <button
+          onClick={() => setSearchQuery('')}
+          className="absolute inset-y-0 right-0 pr-3 flex items-center"
+        >
+          <X className="w-5 h-5" style={{ color: 'var(--text-muted)' }} />
+        </button>
+      )}
+    </div>
+
       {/* Add Room Modal */}
       {showAddRoom && (
-        <div className="glass-card p-6 rounded-xl mb-6 animate-slide-up">
-          <h2 className="text-lg font-semibold text-white mb-4">Add New Room</h2>
+        <div className="glass-card p-6 rounded-xl mb-6 animate-slide-up" style={{ backgroundColor: 'var(--bg-secondary)' }}>
+          <h2 className="text-lg font-semibold mb-4" style={{ color: 'var(--text-primary)' }}>Add New Room</h2>
           <div className="flex gap-4">
             <input
               type="text"
               value={newRoomName}
               onChange={(e) => setNewRoomName(e.target.value)}
               placeholder="Enter room name"
-              className="flex-1 bg-[#262626] text-white border border-gray-600 rounded-lg px-4 py-2 focus:outline-none focus:border-[#EAAC82]"
+              className="flex-1 rounded-lg px-4 py-2 focus:outline-none"
+              style={{ 
+                backgroundColor: 'var(--input-bg)', 
+                color: 'var(--text-primary)', 
+                borderColor: 'var(--border-color)',
+                border: '1px solid var(--border-color)'
+              }}
             />
             <button
               onClick={handleAddRoom}
-              className="bg-[#EAAC82] hover:bg-[#D9A279] text-white px-4 py-2 rounded-lg hover-pulse"
+              className="px-4 py-2 rounded-lg hover-pulse"
+              style={{ backgroundColor: 'var(--accent-color)', color: 'var(--text-on-accent)' }}
             >
               Add
             </button>
             <button
               onClick={() => setShowAddRoom(false)}
-              className="bg-gray-600 hover:bg-gray-700 text-white px-4 py-2 rounded-lg hover-pulse"
+              className="px-4 py-2 rounded-lg hover-pulse"
+              style={{ backgroundColor: 'var(--bg-tertiary)', color: 'var(--text-secondary)' }}
             >
               Cancel
             </button>
@@ -421,208 +483,250 @@ export function RoomsAndDevicesPage() {
       )}
 
       {/* Rooms Carousel */}
-      {rooms.length === 0 ? (
-        
-        <div className="text-center text-gray-400 py-12 glass-card rounded-xl">
-          No rooms available. Click "Add Room" to get started <br />
-          <br />
-          Rooms are essentially containers for your devices  <br />
-          <br />
-          This ensures that all your devices are appropriately turned on based on which room you are in
-        </div>
-      ) : (
-        <div className="relative">
-          {/* Carousel Navigation */}
-          <div className="flex justify-between items-center mb-4">
-            <button
-              onClick={prevRoom}
-              className="bg-[#262626] text-white p-2 rounded-full hover:bg-[#EAAC82] transition-colors z-10"
-              disabled={rooms.length <= 1}
-            >
-              <ChevronLeft className="w-6 h-6" />
-            </button>
+{/* Rooms Carousel - Update to use filteredRooms instead of rooms */}
+    {filteredRooms.length === 0 ? (
+      <div className="text-center py-12 glass-card rounded-xl" 
+        style={{ backgroundColor: 'var(--bg-secondary)', color: 'var(--text-muted)' }}>
+        {searchQuery ? 
+          'No rooms or devices match your search criteria.' : 
+          'No rooms available. Click "Add Room" to get started.'}
+      </div>
+    ) : (
+      <div className="relative">
+        {/* Carousel Navigation - Update to use filteredRooms for dots */}
+        <div className="flex justify-between items-center mb-4">
+          <button
+            onClick={prevRoom}
+            className="p-2 rounded-full transition-colors z-10"
+            style={{ 
+              backgroundColor: 'var(--bg-tertiary)', 
+              color: 'var(--text-primary)'
+            }}
+            disabled={rooms.length <= 1}
+          >
+            <ChevronLeft className="w-6 h-6" />
+          </button>
 
-            <div className="flex space-x-2 justify-center">
-              {rooms.map((_, index) => (
-                <button
-                  key={index}
-                  onClick={() => goToRoom(index)}
-                  className={`h-2 w-2 rounded-full transition-colors ${index === currentRoomIndex ? 'bg-[#EAAC82]' : 'bg-gray-600'
-                    }`}
-                />
-              ))}
-            </div>
-
-            <button
-              onClick={nextRoom}
-              className="bg-[#262626] text-white p-2 rounded-full hover:bg-[#EAAC82] transition-colors z-10"
-              disabled={rooms.length <= 1}
-            >
-              <ChevronRight className="w-6 h-6" />
-            </button>
+          <div className="flex space-x-2 justify-center">
+            {rooms.map((_, index) => (
+              <button
+                key={index}
+                onClick={() => goToRoom(index)}
+                className={`h-2 w-2 rounded-full transition-colors`}
+                style={{ 
+                  backgroundColor: index === currentRoomIndex 
+                    ? 'var(--accent-color)' 
+                    : 'var(--bg-tertiary)' 
+                }}
+              />
+            ))}
           </div>
 
-          {/* Carousel Content */}
-          <div
-            ref={carouselRef}
-            className="overflow-hidden"
+          <button
+            onClick={nextRoom}
+            className="p-2 rounded-full transition-colors z-10"
+            style={{ 
+              backgroundColor: 'var(--bg-tertiary)', 
+              color: 'var(--text-primary)'
+            }}
+            disabled={rooms.length <= 1}
           >
-            <div
-              className="transition-transform duration-300 ease-in-out"
-              style={{ transform: `translateX(-${currentRoomIndex * 100}%)` }}
-            >
-              <div className="flex">
-                {rooms.map(room => (
+            <ChevronRight className="w-6 h-6" />
+          </button>
+        </div>
+
+        {/* Carousel Content - Continue with rooms not filteredRooms since we're using the index-based navigation */}
+        <div
+          ref={carouselRef}
+          className="overflow-hidden"
+        >
+          <div
+            className="transition-transform duration-300 ease-in-out"
+            style={{ transform: `translateX(-${currentRoomIndex * 100}%)` }}
+          >
+            <div className="flex">
+              {rooms.map(room => (
                   <div key={room.room_id} className="w-full flex-shrink-0 px-1">
-                    <div className="glass-card p-6 rounded-xl h-full">
+                    <div className="glass-card p-6 rounded-xl h-full" style={{ backgroundColor: 'var(--bg-secondary)' }}>
                       <div className="flex items-center justify-between mb-4">
-                        <h2 className="text-lg font-semibold text-white">{room.name}</h2>
+                        <h2 className="text-lg font-semibold" style={{ color: 'var(--text-primary)' }}>{room.name}</h2>
                         <button
                           onClick={() => handleDeleteRoom(room.room_id)}
-                          className="text-gray-400 hover:text-red-500 p-2 rounded-lg hover-pulse"
+                          className="p-2 rounded-lg hover-pulse"
+                          style={{ color: 'var(--text-muted)' }}
                         >
-                          <Trash2 className="w-5 h-5" />
+                          <Trash2 className="w-5 h-5" style={{ color: 'var(--danger-text)' }} />
                         </button>
                       </div>
 
                       {/* Devices List */}
                       {room.devices.length === 0 ? (
-                        <div className="text-center text-gray-400 py-6">
+                        <div className="text-center py-6" style={{ color: 'var(--text-muted)' }}>
                           No devices in this room. Click "Add Device" to get started.
                         </div>
                       ) : (
                         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-4">
-{room.devices.map(device => (
-  <div key={device.device_id} className="bg-[#262626] p-4 rounded-lg">
-    <div className="flex justify-between items-start mb-3">
-      <div>
-        <div className="text-white font-medium">{device.name}</div>
-        <div className="text-sm text-gray-400">Code: {device.general_product_code}</div>
-      </div>
-      <div className="flex gap-2">
-        <button
-          onClick={() => fetchDeviceInfo(device.device_id)}
-          className="text-gray-400 hover:text-blue-500 p-2 rounded-lg hover-pulse"
-        >
-          <Info className="w-5 h-5" />
-        </button>
-        <button
-          onClick={() => handleDeleteDevice(room.room_id, device.device_id)}
-          className="text-gray-400 hover:text-red-500 p-2 rounded-lg hover-pulse"
-        >
-          <Trash2 className="w-5 h-5" />
-        </button>
-      </div>
-    </div>
+                          {room.devices.map(device => (
+                            <div key={device.device_id} className="p-4 rounded-lg" style={{ backgroundColor: 'var(--bg-tertiary)' }}>
+                              <div className="flex justify-between items-start mb-3">
+                                <div>
+                                  <div className="font-medium" style={{ color: 'var(--text-primary)' }}>{device.name}</div>
+                                  <div className="text-sm" style={{ color: 'var(--text-muted)' }}>Code: {device.general_product_code}</div>
+                                </div>
+                                <div className="flex gap-2">
+                                  <button
+                                    onClick={() => fetchDeviceInfo(device.device_id)}
+                                    className="p-2 rounded-lg hover-pulse"
+                                    style={{ color: 'var(--text-muted)' }}
+                                  >
+                                    <Info className="w-5 h-5" />
+                                  </button>
+                                  <button
+                                    onClick={() => handleDeleteDevice(room.room_id, device.device_id)}
+                                    className="p-2 rounded-lg hover-pulse"
+                                    style={{ color: 'var(--text-muted)' }}
+                                  >
+                                    <Trash2 className="w-5 h-5" style={{ color: 'var(--danger-text)' }} />
+                                  </button>
+                                </div>
+                              </div>
 
-    {/* Show State Buttons for Devices with Options */}
-    {device.status !== 'off' && device.device_type === 'Variable' && (
-      <div className="text-gray-400">
-        <div className="flex items-center">
-          <button
-            onClick={() => decrementState(room.room_id, device.device_id)}
-            className="bg-[#262626] text-white border border-gray-600 rounded-lg px-4 py-2 focus:outline-none focus:border-[#EAAC82] hover:bg-[#EAAC82]"
-          >
-            -
-          </button>
-          <span className="mx-4 text-white">{device.state}</span>
-          <button
-            onClick={() => incrementState(room.room_id, device.device_id)}
-            className="bg-[#262626] text-white border border-gray-600 rounded-lg px-4 py-2 focus:outline-none focus:border-[#EAAC82] hover:bg-[#EAAC82]"
-          >
-            +
-          </button>
-        </div>
-      </div>
-    )}
+                              {/* Show State Buttons for Devices with Options */}
+                              {device.status !== 'off' && device.device_type === 'Variable' && (
+                                <div style={{ color: 'var(--text-muted)' }}>
+                                  <div className="flex items-center">
+                                    <button
+                                      onClick={() => decrementState(room.room_id, device.device_id)}
+                                      className="rounded-lg px-4 py-2 focus:outline-none"
+                                      style={{ 
+                                        backgroundColor: 'var(--bg-secondary)', 
+                                        color: 'var(--text-primary)', 
+                                        border: '1px solid var(--border-color)' 
+                                      }}
+                                    >
+                                      -
+                                    </button>
+                                    <span className="mx-4" style={{ color: 'var(--text-primary)' }}>{device.state}</span>
+                                    <button
+                                      onClick={() => incrementState(room.room_id, device.device_id)}
+                                      className="rounded-lg px-4 py-2 focus:outline-none"
+                                      style={{ 
+                                        backgroundColor: 'var(--bg-secondary)', 
+                                        color: 'var(--text-primary)', 
+                                        border: '1px solid var(--border-color)' 
+                                      }}
+                                    >
+                                      +
+                                    </button>
+                                  </div>
+                                </div>
+                              )}
 
-    {/* For MonitorFixed or MonitorVariable devices (read-only state) */}
-    {device.device_type === 'MonitorFixed' && device.status !== 'off' && (
-      <div className="text-gray-400">
-        <span className="text-white">{formatOptions([device.state])}</span>
-      </div>
-    )}
+                              {/* For MonitorFixed or MonitorVariable devices (read-only state) */}
+                              {device.device_type === 'MonitorFixed' && device.status !== 'off' && (
+                                <div style={{ color: 'var(--text-muted)' }}>
+                                  <span style={{ color: 'var(--text-primary)' }}>{formatOptions([device.state])}</span>
+                                </div>
+                              )}
 
-    {device.device_type === 'MonitorVariable' && device.status !== 'off' && (
-      <div className="text-gray-400">
-        <span className="text-white">{device.state}</span>
-      </div>
-    )}
+                              {device.device_type === 'MonitorVariable' && device.status !== 'off' && (
+                                <div style={{ color: 'var(--text-muted)' }}>
+                                  <span style={{ color: 'var(--text-primary)' }}>{device.state}</span>
+                                </div>
+                              )}
 
-    {/* For all other devices (dropdown options) */}
-    {device.status !== 'off' && !(device.device_type === 'Variable' ||
-      device.device_type === 'MonitorFixed' ||
-      device.device_type === 'MonitorVariable') &&
-      device.general_product_code.charAt(1) !== 'T' && (
-        <div className="text-gray-400">
-          <select
-            id={`state-${device.device_id}`}
-            value={device.state}
-            onChange={(e) =>
-              handleStateChange(room.room_id, device.device_id, e.target.value)
-            }
-            className="bg-[#262626] text-white border border-gray-600 rounded-lg px-4 py-2 focus:outline-none focus:border-[#EAAC82]"
-          >
-            {formatOptions(device.options).map((option, index) => (
-              <option key={index} value={option}>
-                {option}
-              </option>
-            ))}
-          </select>
-        </div>
-      )}
+                              {/* For all other devices (dropdown options) */}
+                              {device.status !== 'off' && !(device.device_type === 'Variable' ||
+                                device.device_type === 'MonitorFixed' ||
+                                device.device_type === 'MonitorVariable') &&
+                                device.general_product_code.charAt(1) !== 'T' && (
+                                  <div style={{ color: 'var(--text-muted)' }}>
+                                    <select
+                                      id={`state-${device.device_id}`}
+                                      value={device.state}
+                                      onChange={(e) =>
+                                        handleStateChange(room.room_id, device.device_id, e.target.value)
+                                      }
+                                      className="rounded-lg px-4 py-2 focus:outline-none w-full"
+                                      style={{ 
+                                        backgroundColor: 'var(--input-bg)', 
+                                        color: 'var(--text-primary)', 
+                                        border: '1px solid var(--border-color)' 
+                                      }}
+                                    >
+                                      {formatOptions(device.options).map((option, index) => (
+                                        <option key={index} value={option}>
+                                          {option}
+                                        </option>
+                                      ))}
+                                    </select>
+                                  </div>
+                                )}
 
-    <div className="mt-4 flex justify-between items-center">
-      <button
-        onClick={() => toggleDevice(room.room_id, device.device_id)}
-        className={`text-white rounded-lg px-4 py-2 ${device.status === 'off' ? 'bg-gray-500' : 'bg-[#EAAC82]'} `}
-      >
-        {device.status === 'off' ? 'Turn On' : 'Turn Off'}
-      </button>
-    </div>
-  </div>
-))}
+<div className="mt-4 flex justify-between items-center">
+  <button
+    onClick={() => toggleDevice(room.room_id, device.device_id)}
+    className="rounded-lg px-4 py-2"
+    style={{ 
+      backgroundColor: device.status === 'off' 
+        ? 'var(--secondary-accent)' 
+        : 'var(--accent-color)',
+      color: 'var(--text-on-accent)'
+    }}
+  >
+    {device.status === 'off' ? 'Turn On' : 'Turn Off'}
+  </button>
+</div>
+                            </div>
+                          ))}
                         </div>
                       )}
 
                       {/* Add Device Section */}
-{/* Add Device Section */}
-{showAddDevice === room.room_id ? (
-  <div className="space-y-4 mt-4 bg-[#262626] p-4 rounded-lg">
-    <div>
-      <label className="block text-sm text-gray-300 mb-1">Product Code</label>
-      <input
-        type="text"
-        value={newDevice.productCode}
-        onChange={(e) => setNewDevice({ ...newDevice, productCode: e.target.value })}
-        placeholder="Enter product code"
-        className="w-full bg-[#333333] text-white border border-gray-600 rounded-lg px-4 py-2 focus:outline-none focus:border-[#EAAC82]"
-      />
-    </div>
-    <div className="flex gap-4">
-      <button
-        onClick={() => handleAddDevice(room.room_id)}
-        className="flex-1 bg-[#EAAC82] hover:bg-[#D9A279] text-white px-4 py-2 rounded-lg hover-pulse"
-      >
-        Add Device
-      </button>
-      <button
-        onClick={() => setShowAddDevice(null)}
-        className="flex-1 bg-gray-600 hover:bg-gray-700 text-white px-4 py-2 rounded-lg hover-pulse"
-      >
-        Cancel
-      </button>
-    </div>
-  </div>
-) : (
-  <button
-    onClick={() => setShowAddDevice(room.room_id)}
-    className="text-[#8DA08E] hover:text-[#EAAC82] flex items-center gap-2 mt-4 hover-pulse"
-  >
-    <Plus className="w-5 h-5" />
-    Add Device
-  </button>
-)}
+                      {showAddDevice === room.room_id ? (
+                        <div className="space-y-4 mt-4 p-4 rounded-lg" style={{ backgroundColor: 'var(--bg-tertiary)' }}>
+                          <div>
+                            <label className="block text-sm mb-1" style={{ color: 'var(--text-secondary)' }}>Product Code</label>
+                            <input
+                              type="text"
+                              value={newDevice.productCode}
+                              onChange={(e) => setNewDevice({ ...newDevice, productCode: e.target.value })}
+                              placeholder="Enter product code"
+                              className="w-full rounded-lg px-4 py-2 focus:outline-none"
+                              style={{ 
+                                backgroundColor: 'var(--input-bg)', 
+                                color: 'var(--text-primary)', 
+                                border: '1px solid var(--border-color)' 
+                              }}
+                            />
+                          </div>
+                          <div className="flex gap-4">
+                            <button
+                              onClick={() => handleAddDevice(room.room_id)}
+                              className="flex-1 px-4 py-2 rounded-lg hover-pulse"
+                              style={{ backgroundColor: 'var(--accent-color)', color: 'var(--text-on-accent)' }}
+                            >
+                              Add Device
+                            </button>
+                            <button
+                              onClick={() => setShowAddDevice(null)}
+                              className="flex-1 px-4 py-2 rounded-lg hover-pulse"
+                              style={{ backgroundColor: 'var(--bg-secondary)', color: 'var(--text-secondary)' }}
+                            >
+                              Cancel
+                            </button>
+                          </div>
+                        </div>
+                      ) : (
+                        <button
+                          onClick={() => setShowAddDevice(room.room_id)}
+                          className="flex items-center gap-2 mt-4 hover-pulse"
+                          style={{ color: 'var(--secondary-accent)' }}
+                        >
+                          <Plus className="w-5 h-5" />
+                          Add Device
+                        </button>
+                      )}
                     </div>
                   </div>
                 ))}
@@ -632,54 +736,49 @@ export function RoomsAndDevicesPage() {
         </div>
       )}
 
+      {/* Device Info Modal */}
+      {modalOpen && selectedDevice && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 animate-fade-in">
+          <div className="p-6 rounded-lg w-full max-w-md" style={{ backgroundColor: 'var(--bg-secondary)' }}>
+            <div className="flex justify-between items-center mb-4">
+              <h2 className="text-xl font-semibold" style={{ color: 'var(--text-primary)' }}>Device Information</h2>
+              <button
+                onClick={() => setModalOpen(false)}
+                className="p-2 rounded-lg hover-pulse"
+                style={{ color: 'var(--text-muted)' }}
+              >
+                <X className="w-6 h-6" />
+              </button>
+            </div>
 
-
-
-
-      {
-        modalOpen && selectedDevice && (
-          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 animate-fade-in">
-            <div className="bg-[#262626] p-6 rounded-lg w-full max-w-md">
-              <div className="flex justify-between items-center mb-4">
-                <h2 className="text-xl font-semibold text-white">Device Information</h2>
-                <button
-                  onClick={() => setModalOpen(false)}
-                  className="text-gray-400 hover:text-white p-2 rounded-lg hover-pulse"
-                >
-                  <X className="w-6 h-6" />
-                </button>
+            <div className="space-y-4">
+              <div>
+                <label className="text-sm" style={{ color: 'var(--text-secondary)' }}>Device Name:</label>
+                <p className="mt-1" style={{ color: 'var(--text-primary)' }}>{selectedDevice.name}</p>
               </div>
 
-              <div className="space-y-4">
-                <div>
-                  <label className="text-sm text-gray-300">Device Name:</label>
-                  <p className="text-white mt-1">{selectedDevice.name}</p>
-                </div>
-
-                <div>
-                  <label className="text-sm text-gray-300">Product Code:</label>
-                  <p className="text-white mt-1">{selectedDevice.general_product_code}</p>
-                </div>
-
-                {selectedDevice.manufacturer && (
-                  <div>
-                    <label className="text-sm text-gray-300">Manufacturer:</label>
-                    <p className="text-white mt-1">{selectedDevice.manufacturer}</p>
-                  </div>
-                )}
-
-                {selectedDevice.average_energy_consumption_per_hour && (
-                  <div>
-                    <label className="text-sm text-gray-300">Average Usage:</label>
-                    <p className="text-white mt-1">{selectedDevice.average_energy_consumption_per_hour} kWh</p>
-                  </div>
-                )}
-
+              <div>
+                <label className="text-sm" style={{ color: 'var(--text-secondary)' }}>Product Code:</label>
+                <p className="mt-1" style={{ color: 'var(--text-primary)' }}>{selectedDevice.general_product_code}</p>
               </div>
+
+              {selectedDevice.manufacturer && (
+                <div>
+                  <label className="text-sm" style={{ color: 'var(--text-secondary)' }}>Manufacturer:</label>
+                  <p className="mt-1" style={{ color: 'var(--text-primary)' }}>{selectedDevice.manufacturer}</p>
+                </div>
+              )}
+
+              {selectedDevice.average_energy_consumption_per_hour && (
+                <div>
+                  <label className="text-sm" style={{ color: 'var(--text-secondary)' }}>Average Usage:</label>
+                  <p className="mt-1" style={{ color: 'var(--text-primary)' }}>{selectedDevice.average_energy_consumption_per_hour} kWh</p>
+                </div>
+              )}
             </div>
           </div>
-        )
-      }
-    </div >
+        </div>
+      )}
+    </div>
   )
 }

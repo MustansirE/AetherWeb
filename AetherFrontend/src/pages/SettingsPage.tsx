@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from 'react'
 import { 
-  User, HelpCircle, Phone, Mail, Trash2, ChevronDown, ChevronUp, AlertTriangle 
+  User, HelpCircle, Phone, Mail, Trash2, ChevronDown, ChevronUp, AlertTriangle, Sun, Moon 
 } from 'lucide-react'
 import { useNavigate } from 'react-router-dom'
+import { useTheme } from './ThemeContext'
 
 interface FAQ {
   question: string
@@ -30,6 +31,7 @@ const faqs: FAQ[] = [
 
 export function SettingsPage() {
   const navigate = useNavigate()
+  const { theme, toggleTheme } = useTheme()
   const [expandedFaq, setExpandedFaq] = useState<number | null>(null)
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false)
   const [isEditing, setIsEditing] = useState(false)
@@ -106,50 +108,81 @@ export function SettingsPage() {
     }
   };
   
-
   return (
-    <div className="space-y-8 max-w-4xl mx-auto">
-      <h1 className="text-2xl font-semibold text-white">Settings</h1>
+    <div 
+      className="space-y-8 max-w-4xl mx-auto p-4"
+      style={{ backgroundColor: 'var(--bg-primary)' }}
+    >
+      <div className="flex justify-between items-center">
+        <h1 className="text-2xl font-semibold" style={{ color: 'var(--text-primary)' }}>Settings</h1>
+        <button 
+          onClick={toggleTheme}
+          className="p-2.5 rounded-full bg-opacity-20 hover:bg-opacity-30 transition-colors"
+          style={{ backgroundColor: 'var(--bg-tertiary)' }}
+          aria-label={`Switch to ${theme === 'dark' ? 'light' : 'dark'} mode`}
+        >
+          {theme === 'dark' ? (
+            <Sun className="w-5 h-5 text-[#EAAC82]" />
+          ) : (
+            <Moon className="w-5 h-5 text-[#EAAC82]" />
+          )}
+        </button>
+      </div>
 
       {/* Profile Section */}
-      <section className="glass-card rounded-xl p-6">
+      <section className="glass-card rounded-xl p-6" style={{ backgroundColor: 'var(--bg-secondary)' }}>
         <div className="flex items-center gap-2 mb-6">
           <User className="w-5 h-5 text-[#EAAC82]" />
-          <h2 className="text-lg font-semibold text-white">My Profile</h2>
+          <h2 className="text-lg font-semibold" style={{ color: 'var(--text-primary)' }}>My Profile</h2>
         </div>
         <div className="grid gap-6">
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm text-gray-400 mb-1">First Name</label>
+              <label className="block text-sm mb-1" style={{ color: 'var(--text-muted)' }}>First Name</label>
               <input
                 type="text"
                 name="first_name"
                 value={user.first_name}
                 onChange={handleChange}
-                className="w-full bg-[#262626] text-white border border-gray-600 rounded-lg px-4 py-2"
+                className="w-full border rounded-lg px-4 py-2"
+                style={{ 
+                  backgroundColor: 'var(--input-bg)',
+                  color: 'var(--text-primary)',
+                  borderColor: 'var(--border-color)'
+                }}
                 readOnly={!isEditing}
               />
             </div>
             <div>
-              <label className="block text-sm text-gray-400 mb-1">Last Name</label>
+              <label className="block text-sm mb-1" style={{ color: 'var(--text-muted)' }}>Last Name</label>
               <input
                 type="text"
                 name="last_name"
                 value={user.last_name}
                 onChange={handleChange}
-                className="w-full bg-[#262626] text-white border border-gray-600 rounded-lg px-4 py-2"
+                className="w-full border rounded-lg px-4 py-2"
+                style={{ 
+                  backgroundColor: 'var(--input-bg)',
+                  color: 'var(--text-primary)',
+                  borderColor: 'var(--border-color)'
+                }}
                 readOnly={!isEditing}
               />
             </div>
           </div>
           <div>
-            <label className="block text-sm text-gray-400 mb-1">Email Address</label>
+            <label className="block text-sm mb-1" style={{ color: 'var(--text-muted)' }}>Email Address</label>
             <input
               type="email"
               name="email"
               value={user.email}
               onChange={handleChange}
-              className="w-full bg-[#262626] text-white border border-gray-600 rounded-lg px-4 py-2"
+              className="w-full border rounded-lg px-4 py-2"
+              style={{ 
+                backgroundColor: 'var(--input-bg)',
+                color: 'var(--text-primary)',
+                borderColor: 'var(--border-color)'
+              }}
               readOnly={!isEditing}
             />
           </div>
@@ -157,43 +190,132 @@ export function SettingsPage() {
 
         {isEditing ? (
           <div className="flex gap-3 mt-4">
-            <button onClick={() => setIsEditing(false)} className="flex-1 bg-gray-600 hover:bg-gray-700 text-white py-3 rounded-lg">
+            <button 
+              onClick={() => setIsEditing(false)} 
+              className="flex-1 py-3 rounded-lg transition-colors"
+              style={{ 
+                backgroundColor: 'var(--bg-tertiary)',
+                color: 'var(--text-primary)'
+              }}
+            >
               Cancel
             </button>
-            <button onClick={handleSave} className="flex-1 bg-[#EAAC82] hover:bg-orange-600 text-white py-3 rounded-lg">
+            <button 
+              onClick={handleSave} 
+              className="flex-1 py-3 rounded-lg"
+              style={{
+                backgroundColor: 'var(--accent-color)',
+                color: 'white'
+              }}
+            >
               Save Changes
             </button>
           </div>
         ) : (
-          <button onClick={() => setIsEditing(true)} className="w-full mt-4 bg-[#EAAC82] hover:bg-orange-600 text-white py-3 rounded-lg">
+          <button 
+            onClick={() => setIsEditing(true)} 
+            className="w-full mt-4 py-3 rounded-lg"
+            style={{
+              backgroundColor: 'var(--accent-color)',
+              color: 'white'
+            }}
+          >
             Edit Profile
           </button>
         )}
       </section>
 
+      {/* Theme Settings Section */}
+      <section className="glass-card rounded-xl p-6" style={{ backgroundColor: 'var(--bg-secondary)' }}>
+        <div className="flex items-center gap-2 mb-6">
+          {theme === 'dark' ? (
+            <Moon className="w-5 h-5 text-[#EAAC82]" />
+          ) : (
+            <Sun className="w-5 h-5 text-[#EAAC82]" />
+          )}
+          <h2 className="text-lg font-semibold" style={{ color: 'var(--text-primary)' }}>Appearance</h2>
+        </div>
+        <div className="flex items-center justify-between" style={{ color: 'var(--text-primary)' }}>
+          <span>Theme</span>
+          <div 
+            className="flex items-center gap-2 p-2 rounded-lg cursor-pointer"
+            style={{ backgroundColor: 'var(--bg-tertiary)' }}
+            onClick={toggleTheme}
+          >
+            {theme === 'dark' ? 'Dark Mode' : 'Light Mode'}
+            {theme === 'dark' ? (
+              <Moon className="w-4 h-4 text-[#EAAC82]" />
+            ) : (
+              <Sun className="w-4 h-4 text-[#EAAC82]" />
+            )}
+          </div>
+        </div>
+      </section>
+
       {/* FAQs Section */}
-      <section className="glass-card rounded-xl p-6">
+      <section className="glass-card rounded-xl p-6" style={{ backgroundColor: 'var(--bg-secondary)' }}>
         <div className="flex items-center gap-2 mb-6">
           <HelpCircle className="w-5 h-5 text-[#EAAC82]" />
-          <h2 className="text-lg font-semibold text-white">General FAQs</h2>
+          <h2 className="text-lg font-semibold" style={{ color: 'var(--text-primary)' }}>General FAQs</h2>
         </div>
         {faqs.map((faq, index) => (
-          <div key={index} className="border border-gray-700 rounded-lg">
-            <button onClick={() => setExpandedFaq(expandedFaq === index ? null : index)} className="w-full px-4 py-3 flex items-center justify-between text-left hover:bg-[#262626]">
-              <span className="text-white font-medium">{faq.question}</span>
-              {expandedFaq === index ? <ChevronUp className="w-5 h-5 text-gray-400" /> : <ChevronDown className="w-5 h-5 text-gray-400" />}
+          <div key={index} 
+            className="border rounded-lg mb-2"
+            style={{ borderColor: 'var(--border-color)' }}
+          >
+            <button 
+              onClick={() => setExpandedFaq(expandedFaq === index ? null : index)} 
+              className="w-full px-4 py-3 flex items-center justify-between text-left"
+              style={{ 
+                color: 'var(--text-primary)',
+                backgroundColor: expandedFaq === index ? 'var(--bg-tertiary)' : 'transparent',
+              }}
+            >
+              <span className="font-medium">{faq.question}</span>
+              {expandedFaq === index ? 
+                <ChevronUp className="w-5 h-5" style={{ color: 'var(--text-muted)' }} /> : 
+                <ChevronDown className="w-5 h-5" style={{ color: 'var(--text-muted)' }} />
+              }
             </button>
-            {expandedFaq === index && <div className="px-4 py-3 bg-[#262626] text-gray-300">{faq.answer}</div>}
+            {expandedFaq === index && (
+              <div 
+                className="px-4 py-3"
+                style={{ 
+                  backgroundColor: 'var(--bg-tertiary)',
+                  color: 'var(--text-secondary)'
+                }}
+              >
+                {faq.answer}
+              </div>
+            )}
           </div>
         ))}
       </section>
 
       {/* Delete Account */}
-      <section className="glass-card rounded-xl p-6">
-        <button onClick={() => setShowDeleteConfirm(true)} className="w-full bg-red-500/10 hover:bg-red-500/20 text-red-500 py-3 rounded-lg">
+      <section className="glass-card rounded-xl p-6" style={{ backgroundColor: 'var(--bg-secondary)' }}>
+        <button 
+          onClick={() => setShowDeleteConfirm(true)} 
+          className="w-full py-3 rounded-lg"
+          style={{
+            backgroundColor: 'var(--danger-bg)',
+            color: 'var(--danger-text)'
+          }}
+        >
           Delete My Account
         </button>
-        {showDeleteConfirm && <button onClick={handleDeleteAccount} className="w-full bg-red-500 text-white py-3 rounded-lg">Confirm Delete</button>}
+        {showDeleteConfirm && (
+          <button 
+            onClick={handleDeleteAccount} 
+            className="w-full py-3 rounded-lg mt-3"
+            style={{
+              backgroundColor: 'var(--danger-color)',
+              color: 'white'
+            }}
+          >
+            Confirm Delete
+          </button>
+        )}
       </section>
     </div>
   )

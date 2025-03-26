@@ -86,15 +86,15 @@ def automations_list(request):
 
         # views.py (in automations_list)
         # Change the isActive field to use is_running
-        automations_data.append({
-            "id": str(automation.id),
-            "name": automation.name,
-            "startTime": automation.start_time.strftime('%H:%M'),
-            "endTime": automation.end_time.strftime('%H:%M'),
-            "status": automation.status,
-            "isActive": automation.is_running,  # Changed here
-            "devices": devices_data,
-        })
+            automations_data.append({
+                "id": str(automation.id),
+                "name": automation.name,
+                "startTime": automation.start_time.strftime('%H:%M'),
+                "endTime": automation.end_time.strftime('%H:%M'),
+                "status": automation.status,
+                "isActive": automation.is_running,  # Changed here
+                "devices": devices_data,
+            })
 
         print(automations_data)  # Debugging: Log the automations data
         return JsonResponse({"automations": automations_data}, status=200)

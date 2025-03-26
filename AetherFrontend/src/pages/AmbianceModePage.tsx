@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Plus, X, Minus, ChevronDown, Trash2, Edit2, Power } from 'lucide-react';
+import { Plus, X, Minus, ChevronDown, Trash2, Edit2, Power, Search } from 'lucide-react';
 
 interface Device {
   deviceId: string;
@@ -33,6 +33,24 @@ export function AmbianceModePage() {
   const [rooms, setRooms] = useState<Room[]>([]);
   const [roomDevices, setRoomDevices] = useState<Device[]>([]);
   const [editModeId, setEditModeId] = useState<string | null>(null);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [filteredModes, setFilteredModes] = useState<AmbianceMode[]>([]);
+
+  useEffect(() => {
+    if (!searchQuery.trim()) {
+      setFilteredModes(ambianceModes);
+    } else {
+      const lowercaseQuery = searchQuery.toLowerCase();
+      const filtered = ambianceModes.filter(mode => 
+        mode.name.toLowerCase().includes(lowercaseQuery) ||
+        mode.roomName.toLowerCase().includes(lowercaseQuery) ||
+        mode.devices.some(device => 
+          device.deviceName.toLowerCase().includes(lowercaseQuery)
+        )
+      );
+      setFilteredModes(filtered);
+    }
+  }, [ambianceModes, searchQuery]);
 
   // Fetch modes and rooms on component mount
   useEffect(() => {
@@ -328,45 +346,87 @@ export function AmbianceModePage() {
   return (
     <div className="space-y-6 animate-fade-in">
       <div className="flex justify-between items-center">
-        <h1 className="text-2xl font-semibold text-white">Ambiance Modes</h1>
+        <h1 className="text-2xl font-semibold" style={{ color: 'var(--text-primary)' }}>Ambiance Modes</h1>
         <button
           onClick={() => setShowAddMode(true)}
-          className="bg-[#8DA08E] hover:bg-[#7A9580] text-white px-4 py-2 rounded-lg flex items-center gap-2 transition-colors hover-pulse"
+          className="px-4 py-2 rounded-lg flex items-center gap-2 transition-colors hover-pulse"
+          style={{ backgroundColor: 'var(--secondary-accent)', color: 'white' }}
         >
           <Plus className="w-5 h-5" />
           Add Mode
         </button>
       </div>
 
+      {/* Add Search Bar */}
+      <div className="relative">
+        <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+          <Search className="w-5 h-5" style={{ color: 'var(--text-muted)' }} />
+        </div>
+        <input
+          type="text"
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
+          className="w-full pl-10 pr-4 py-2 rounded-lg focus:outline-none"
+          style={{ 
+            backgroundColor: 'var(--input-bg)', 
+            color: 'var(--text-primary)',
+            border: '1px solid var(--border-color)' 
+          }}
+          placeholder="Search modes or devices..."
+        />
+        {searchQuery && (
+          <button
+            onClick={() => setSearchQuery('')}
+            className="absolute inset-y-0 right-0 pr-3 flex items-center"
+          >
+            <X className="w-5 h-5" style={{ color: 'var(--text-muted)' }} />
+          </button>
+        )}
+      </div>
+
       {showAddMode && (
-        <div className="glass-card p-6 rounded-xl animate-slide-up">
+        <div className="glass-card p-6 rounded-xl animate-slide-up" style={{ backgroundColor: 'var(--bg-secondary)' }}>
           <div className="flex justify-between items-center mb-6">
-            <h2 className="text-lg font-semibold text-white">
+            <h2 className="text-lg font-semibold" style={{ color: 'var(--text-primary)' }}>
               {editModeId ? 'Edit Ambiance Mode' : 'Create New Ambiance Mode'}
             </h2>
-            <button onClick={resetForm} className="text-gray-400 hover:text-gray-300">
+            <button 
+              onClick={resetForm} 
+              style={{ color: 'var(--text-muted)' }}
+              className="hover:opacity-80"
+            >
               <X className="w-5 h-5" />
             </button>
           </div>
 
           <div className="space-y-4">
             <div>
-              <label className="block text-sm font-medium text-gray-200 mb-2">Mode Name</label>
+              <label className="block text-sm font-medium mb-2" style={{ color: 'var(--text-secondary)' }}>Mode Name</label>
               <input
                 type="text"
                 value={modeName}
                 onChange={(e) => setModeName(e.target.value)}
                 placeholder="Enter mode name"
-                className="w-full bg-[#262626] text-white border border-gray-600 rounded-lg px-4 py-2"
+                className="w-full rounded-lg px-4 py-2 border focus:outline-none"
+                style={{ 
+                  backgroundColor: 'var(--input-bg)', 
+                  color: 'var(--text-primary)', 
+                  borderColor: 'var(--border-color)' 
+                }}
               />
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-200 mb-2">Select Room</label>
+              <label className="block text-sm font-medium mb-2" style={{ color: 'var(--text-secondary)' }}>Select Room</label>
               <select
                 value={selectedRoomId}
                 onChange={(e) => setSelectedRoomId(e.target.value)}
-                className="w-full bg-[#262626] text-white border border-gray-600 rounded-lg px-4 py-2"
+                className="w-full rounded-lg px-4 py-2 border focus:outline-none"
+                style={{ 
+                  backgroundColor: 'var(--input-bg)', 
+                  color: 'var(--text-primary)', 
+                  borderColor: 'var(--border-color)' 
+                }}
               >
                 <option value="">Choose a room</option>
                 {rooms.map(room => (
@@ -380,15 +440,24 @@ export function AmbianceModePage() {
             {/* Device Controls */}
             <div className="space-y-4">
               {roomDevices.map(device => (
-                <div key={device.deviceId} className="flex items-center justify-between bg-[#262626] p-3 rounded-lg">
-                  <span className="text-white">{device.deviceName}</span>
+                <div 
+                  key={device.deviceId} 
+                  className="flex items-center justify-between p-3 rounded-lg"
+                  style={{ backgroundColor: 'var(--bg-tertiary)' }}
+                >
+                  <span style={{ color: 'var(--text-primary)' }}>{device.deviceName}</span>
 
                   {/* Dropdown for devices with options */}
                   {device.type === 'FixedOption' && device.options && (
                     <select
                       value={selectedDevices[device.deviceId] || device.state}
                       onChange={(e) => handleDeviceChange(device.deviceId, e.target.value)}
-                      className="bg-[#333] text-white border border-gray-500 px-3 py-1 rounded-lg"
+                      className="px-3 py-1 rounded-lg border"
+                      style={{ 
+                        backgroundColor: 'var(--input-bg)', 
+                        color: 'var(--text-primary)', 
+                        borderColor: 'var(--border-color)' 
+                      }}
                     >
                       {Array.isArray(device.options) ? (
                         device.options.map(option => (
@@ -412,11 +481,12 @@ export function AmbianceModePage() {
                             Math.max(16, Number(selectedDevices[device.deviceId] || device.state) - 1)
                           )
                         }
-                        className="p-2 bg-gray-700 rounded-lg"
+                        className="p-2 rounded-lg"
+                        style={{ backgroundColor: 'var(--bg-secondary)' }}
                       >
-                        <Minus />
+                        <Minus style={{ color: 'var(--text-primary)' }} />
                       </button>
-                      <span className="text-white">
+                      <span style={{ color: 'var(--text-primary)' }}>
                         {selectedDevices[device.deviceId] || device.state}
                       </span>
                       <button
@@ -426,9 +496,10 @@ export function AmbianceModePage() {
                             Math.min(32, Number(selectedDevices[device.deviceId] || device.state) + 1)
                           )
                         }
-                        className="p-2 bg-gray-700 rounded-lg"
+                        className="p-2 rounded-lg"
+                        style={{ backgroundColor: 'var(--bg-secondary)' }}
                       >
-                        <Plus />
+                        <Plus style={{ color: 'var(--text-primary)' }} />
                       </button>
                     </div>
                   )}
@@ -439,7 +510,8 @@ export function AmbianceModePage() {
             <div className="flex justify-end">
               <button
                 onClick={editModeId ? handleSaveEdit : handleAddMode}
-                className="bg-[#8DA08E] hover:bg-[#7A9580] text-white px-4 py-2 rounded-lg flex items-center gap-2 transition-colors hover-pulse"
+                className="px-4 py-2 rounded-lg flex items-center gap-2 transition-colors hover-pulse"
+                style={{ backgroundColor: 'var(--accent-color)', color: 'white' }}
               >
                 {editModeId ? 'Save Changes' : 'Add Mode'}
               </button>
@@ -448,46 +520,65 @@ export function AmbianceModePage() {
         </div>
       )}
 
-      {/* List of Ambiance Modes */}
+      {/* List of Ambiance Modes - Use filteredModes instead of ambianceModes */}
       <div className="space-y-4">
-        {ambianceModes.map(mode => (
-          <div key={mode.id} className="glass-card p-6 rounded-xl">
+        {filteredModes.map(mode => (
+          <div key={mode.id} className="glass-card p-6 rounded-xl" style={{ backgroundColor: 'var(--bg-secondary)' }}>
             <div className="flex justify-between items-center">
               <div>
-                <h2 className="text-lg font-semibold text-white">{mode.name}</h2>
-                <p className="text-gray-400">{mode.roomName}</p>
+                <h2 className="text-lg font-semibold" style={{ color: 'var(--text-primary)' }}>{mode.name}</h2>
+                <p style={{ color: 'var(--text-muted)' }}>{mode.roomName}</p>
               </div>
               <div className="flex items-center gap-2">
                 <button
                   onClick={() => handleToggleMode(mode.id)}
-                  className={`p-2 rounded-lg ${mode.isActive ? 'bg-green-500' : 'bg-gray-700'}`}
+                  className="p-2 rounded-lg"
+                  style={{ 
+                    backgroundColor: mode.isActive ? 'var(--success-color)' : 'var(--bg-tertiary)',
+                    color: mode.isActive ? 'white' : 'var(--text-muted)'
+                  }}
                 >
-                  <Power className="w-5 h-5 text-white" />
+                  <Power className="w-5 h-5" />
                 </button>
                 <button
                   onClick={() => handleEditMode(mode.id)}
-                  className="p-2 bg-gray-700 rounded-lg"
+                  className="p-2 rounded-lg"
+                  style={{ backgroundColor: 'var(--bg-tertiary)' }}
                 >
-                  <Edit2 className="w-5 h-5 text-white" />
+                  <Edit2 className="w-5 h-5" style={{ color: 'var(--text-primary)' }} />
                 </button>
                 <button
                   onClick={() => handleDeleteMode(mode.id)}
-                  className="p-2 bg-red-500 rounded-lg"
+                  className="p-2 rounded-lg"
+                  style={{ backgroundColor: 'var(--danger-bg)' }}
                 >
-                  <Trash2 className="w-5 h-5 text-white" />
+                  <Trash2 className="w-5 h-5" style={{ color: 'var(--danger-text)' }} />
                 </button>
               </div>
             </div>
             <div className="mt-4 space-y-2">
               {mode.devices.map(device => (
-                <div key={device.deviceId} className="flex items-center justify-between bg-[#262626] p-3 rounded-lg">
-                  <span className="text-white">{device.deviceName}</span>
-                  <span className="text-gray-400">{device.state}</span>
+                <div 
+                  key={device.deviceId} 
+                  className="flex items-center justify-between p-3 rounded-lg"
+                  style={{ backgroundColor: 'var(--bg-tertiary)' }}
+                >
+                  <span style={{ color: 'var(--text-primary)' }}>{device.deviceName}</span>
+                  <span style={{ color: 'var(--text-muted)' }}>{device.state}</span>
                 </div>
               ))}
             </div>
           </div>
         ))}
+
+        {/* Empty State - Updated to check filteredModes and show different message when searching */}
+        {filteredModes.length === 0 && !showAddMode && (
+          <div className="text-center py-8" style={{ color: 'var(--text-muted)' }}>
+            {searchQuery ? 
+              'No ambiance modes match your search criteria.' : 
+              'No ambiance modes created yet. Click "Add Mode" to get started.'}
+          </div>
+        )}
       </div>
     </div>
   );
